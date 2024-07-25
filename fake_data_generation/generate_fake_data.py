@@ -122,7 +122,7 @@ with pd.ExcelWriter(f"data/{args.filename}.xlsx") as writer:
     student_df.to_excel(writer, sheet_name="students", index=False)
     ward_df.to_excel(writer, sheet_name="wards", index=False)
     placement_df.to_excel(writer, sheet_name="placements", index=False)
-    writer.save()
+    writer.close()
 
 # Message to show script has run
 print(
