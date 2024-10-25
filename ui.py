@@ -191,7 +191,7 @@ if page == "Run algorithm":
     numberOfChromosomes = params["ui_params"]["numberOfChromosomes"]
 
     file_source = st.selectbox(
-        "Select your data source", ["Fake data", "Your own data"]
+        "Select your data source", ["Your own data", "Fake data"]
     )
 
     if file_source == "Fake data":
@@ -308,6 +308,10 @@ if page == "Run algorithm":
                 end_message.error(
                     "Schedule production complete, no viable schedules found"
                 )
+        ########################REMOVE FOR STREAMLIT!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        viableBool = main(num_schedules, numberOfChromosomes)
+
 elif page == "Documentation":
     f = open("README_ui.md", "r")
     st.markdown(f.read())

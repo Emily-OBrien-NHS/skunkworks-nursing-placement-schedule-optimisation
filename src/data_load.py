@@ -4,6 +4,7 @@ from src.Slot import Slot
 from src.Ward import Ward
 from src.Placement import Placement
 import time
+import re
 
 
 class DataLoader:
@@ -23,7 +24,15 @@ class DataLoader:
         self.uni_placements = pd.read_excel(
             filename, sheet_name="placements", engine="openpyxl"
         )
+        #Convert bool columns to bools
+        self.students["is_driver"] = self.students["is_driver"].astype(bool)
+        self.ward_data["need_to_drive"] = self.ward_data["need_to_drive"].astype(bool)
 
+        self.students["student_name"] = (
+            self.students["Forename"].astype(str)
+            + " "
+            +self.students["Surname"].astype(str)
+        )
         self.students["student_cohort"] = (
             self.students["university"].astype(str)
             + "_"
@@ -47,6 +56,29 @@ class DataLoader:
             lambda x: x[1:-1].split(",")
         )
 
+        #Get all of the wards that are in the allprevwards so we can add any
+        #missing ones to the wards sheet.
+        self.all_prev_wards = list(set(
+            [x for y in self.students["allprevwards"].values for x in y]
+        ))
+        self.missing_prev_wards = [
+            ward.rstrip().lstrip() for ward in self.all_prev_wards
+            if (ward not in self.ward_data["ward_name"] and len(ward)>0)
+        ]
+        self.no_missing = len(self.missing_prev_wards)
+        self.missing_prev_wards = pd.DataFrame(
+            {
+                "ward_name":self.missing_prev_wards,
+                "ward_speciality":[""]*self.no_missing,
+                "capacity_num":[0]*self.no_missing,
+                "p1_cap":[0]*self.no_missing,
+                "p2_cap":[0]*self.no_missing,
+                "p3_cap":[0]*self.no_missing,
+                "nurse_associate_cap":[0]*self.no_missing
+            }
+        )
+        self.ward_data = pd.concat([self.ward_data, self.missing_prev_wards])
+
         # Process ward info
         # Calculate audit expiry date week relative to the earliest placement in the file
         self.ward_data["education_audit_exp_week"] = np.round(
@@ -59,7 +91,7 @@ class DataLoader:
             / np.timedelta64(1, "W"),
             0,
         )
-        self.ward_data["capacity"] = self.ward_data[["p1_cap", "p2_cap", "p3_cap"]].max(
+        self.ward_data["capacity"] = self.ward_data[["p1_cap", "p2_cap", "p3_cap", "nurse_associate_cap"]].max(
             axis=1
         )
         self.ward_data = self.ward_data[
@@ -73,6 +105,8 @@ class DataLoader:
                 "p1_cap",
                 "p2_cap",
                 "p3_cap",
+                "nurse_associate_cap",
+                "need_to_drive"
             ]
         ]
         self.ward_data.columns = [
@@ -85,7 +119,10 @@ class DataLoader:
             "P1_CAP",
             "P2_CAP",
             "P3_CAP",
+            "Nurse_Assoc_CAP",
+            "need_to_drive"
         ]
+
 
         self.ward_dep_match = pd.Series(
             self.ward_data.Department.values, index=self.ward_data.Ward
@@ -104,6 +141,12 @@ class DataLoader:
         self.student_placements = self.students.merge(
             self.uni_placements, how="left", on="student_cohort"
         )
+
+        #Remove wards with no capacity (included as previous placements that
+        #were done on wards we don't allocate to)
+        self.ward_data = self.ward_data.loc[
+            self.ward_data["capacity"] > 0
+        ].copy()
 
         # Process placement student_placements
         self.student_placements["placement_start_date"] = pd.to_datetime(
@@ -163,24 +206,42 @@ class DataLoader:
                     row.P1_CAP,
                     row.P2_CAP,
                     row.P3_CAP,
+                    row.Nurse_Assoc_CAP,
+                    row.need_to_drive
                 ]
             )
             ward_item = Ward(row_contents)
             self.wards.append(ward_item)
 
+        #re-order student placements such that non drivers, nurse assoc and 1st
+        #and 3rd year are assigned first.
+        placement_ordering = {
+            'Year ' + re.findall(r'\d+', col)[0]:i for i, col in 
+            enumerate(self.ward_data[['P1_CAP', 'P2_CAP', 'P3_CAP']].sum()
+                      .sort_values().index)
+                      }
+        self.student_placements['year_order'] = (self.student_placements['year']
+                                                 .map(placement_ordering))
+        self.student_placements = self.student_placements.sort_values(
+            by=['is_driver', 'year_order']
+            )
         self.placements = []
         for index, row in self.student_placements.iterrows():
             row_contents = []
-            year_num = row.placement_name.split(",", maxsplit=1)[0]
+            year_num = row.placement_name.split(":", maxsplit=1)[0]
+            nurse_assoc = 'Nursing Associate' in row.qualification_x
             row_contents.extend(
                 [
                     index,
+                    row.student_name,
                     str(row.student_id) + "_" + str(row.placement_name),
                     row.student_cohort,
                     row.placement_len_weeks,
                     row.placement_start_date,
                     row.placement_start_date_raw,
                     year_num,
+                    nurse_assoc,
+                    row.is_driver,
                     row.allprevwards,
                     row.allprevdeps,
                     row.allowable_covid_status,

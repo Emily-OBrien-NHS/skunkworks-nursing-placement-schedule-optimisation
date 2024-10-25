@@ -55,6 +55,24 @@
                     "Example": "UniversityA_BSc Jan99"
                 }
             ],
+
+            "Forename": [
+                {
+                    "name": "Forename",
+                    "description": "Student Forename",
+                    "type": "string",
+                    "Example": "Jane"
+                }
+            ],
+            "Surname": [
+                {
+                    "name": "Surname",
+                    "description": "Student Surname",
+                    "type": "string",
+                    "Example": "Doe"
+                }
+            ],
+
             "university": [
                 {
                     "name": "university",
@@ -71,6 +89,16 @@
                     "Example": "BSc"
                 }
             ],
+
+            "course_start": [
+                {
+                    "name": "course_start",
+                    "description": "Date the student started the course",
+                    "type": "datetime",
+                    "Example": "01/01/1990"
+                }
+            ],
+
             "year": [
                 {
                     "name": "year",
@@ -87,6 +115,16 @@
                     "Example": "['ward1','ward2','ward3']"
                 }
             ],
+
+            "Driver": [
+                {
+                    "name": "Driver",
+                    "description": "A flag of if the student drives/has a car to access remote placements",
+                    "type": "bool",
+                    "Example": "True"
+                }
+            ],
+
             "allowable_covid_status": [
                 {
                     "name": "allowable_covid_status",
@@ -163,6 +201,22 @@
                     "description": "The number of year 3 (or part 3) students that the ward can accommodate",
                     "type": "int64",
                     "Example": "2"
+                }
+            ],
+            "nurse_associate_cap": [
+                {
+                    "name": "nurse_associate_cap",
+                    "description": "The number of nursing associate students that the ward can accommodate",
+                    "type": "int64",
+                    "Example": "2"
+                }
+            ],
+            "need_to_drive": [
+                {
+                    "name": "need_to_drive",
+                    "description": "Flag for remote wards that require student to drive/own a car",
+                    "type": "bool",
+                    "Example": "True"
                 }
             ]
         }

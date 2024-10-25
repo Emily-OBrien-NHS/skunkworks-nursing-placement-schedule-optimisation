@@ -1,6 +1,6 @@
 # Parameters for User Interface
 ui_params:
-  input_file_name: 'file_name_here' # Input file name
+  input_file_name: 'Data_Set_3.xlsx' # Input file name
   numberOfChromosomes: 50 # Total number of schedules in population used to find best schedule. Note that higher number increases run time.
 
 # Parameters related to scoring of schedules

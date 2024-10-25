@@ -11,6 +11,7 @@ from typing import Tuple
 import yaml
 import os
 import logging
+import random
 
 
 class Schedule:
@@ -106,12 +107,11 @@ class Schedule:
         :param ward_id: id of the ward as per original data
         :returns: capacity for the specific type of placement and ward
         """
-
-        if placement.part == "P1":
+        if placement.part == "Year 1":
             year_cap = self.wards[ward_id].p1_capacity
-        elif placement.part == "P2":
+        elif placement.part == "Year 2":
             year_cap = self.wards[ward_id].p2_capacity
-        elif placement.part == "P3":
+        elif placement.part == "Year 3":
             year_cap = self.wards[ward_id].p3_capacity
         else:
             year_cap = self.wards[ward_id].capacity
@@ -139,21 +139,77 @@ class Schedule:
 
         :returns: no explicit return but populates conf_placements class object
         """
-
         for p in self.placements:
             placement_duration = int(p.duration)
             invalid_ward = True
+            #print(f'---------------------------------Student: {p.student_name}')
+            #list of valid wards
+            valid_ward_ids = []
+            for ward_id in range(0, len(self.wards) - 1):
+                slot_index_increment = self.calc_slot_index(
+                    ward_id, self.num_weeks, p.start)
+                year_cap = self.id_year_capacity(p, ward_id)
+                self.ward = self.wards[ward_id]
+                valid_ward = True
+                #If no capacity for students in that year, then ward is invalid
+                if year_cap == 0:
+                    valid_ward = False
+                #If course is Nursing Associate, ensure no placements are assigned
+                #to a ward that cannot accomodate this
+                elif (p.nurse_assoc
+                    and self.ward.nurse_assoc_capacity == 0):
+                    valid_ward = False
+                #If student is not a driver, ensure no placements are assigned
+                #to a ward that would require driving.
+                elif ((not p.is_driver) and (self.ward.need_to_drive)):
+                    valid_ward = False
+                #Check occupancy for placement duration
+                for i in range(0, placement_duration):
+                    # Check if overall capacity breached or ward has expired education audit
+                    if (len(self.slots[slot_index_increment])
+                        >= self.ward.capacity
+                        ) or ((p.covid_status == "Low/Medium")
+                              and (self.ward.covid_status == "Medium/High")):
+                            valid_ward = False
+                    else:
+                        # If overall cap and education audit are fine, check whether year-specific capacity satisfied
+                        same_year_count = 0
+                        for plac in self.slots[slot_index_increment]:
+                            if plac.part == p.part:
+                                same_year_count += 1
+                        if same_year_count >= year_cap:
+                            valid_ward = False
+                    slot_index_increment += 1
+                if valid_ward:
+                    valid_ward_ids.append(ward_id)
+            if len(valid_ward_ids) == 0:
+                print(f'ERROR: No Valid Wards remaining for {p.student_name}')
+                break
 
             # Find a ward which valid based on capacity and education audit
             while invalid_ward:
                 invalid_ward = False
-                ward_id = randint(0, len(self.wards) - 1)
+                #ward_id = randint(0, len(self.wards) - 1)
+                ward_id = random.choice(valid_ward_ids)
                 slot_index_increment = self.calc_slot_index(
                     ward_id, self.num_weeks, p.start
                 )
-
+                #If no capacity for students in that year, then ward is invalid
                 year_cap = self.id_year_capacity(p, ward_id)
+
+                #If no capacity for students in that year, then ward is invalid
                 if year_cap == 0:
+                    invalid_ward = True
+                #If course is Nursing Associate, ensure no placements are assigned
+                #to a ward that cannot accomodate this
+                elif (p.nurse_assoc
+                    and self.wards[ward_id].nurse_assoc_capacity == 0):
+                    print('Ward invalid as nursing assoc')
+                    invalid_ward = True
+                #If student is not a driver, ensure no placements are assigned
+                #to a ward that would require driving.
+                elif ((not p.is_driver) and (self.wards[ward_id].need_to_drive)):
+                    print('Ward invalid as student is not driver')
                     invalid_ward = True
                 else:
                     for i in range(0, placement_duration):
@@ -179,8 +235,8 @@ class Schedule:
                             if invalid_ward:
                                 break
                         slot_index_increment += 1
-
-            # Now that ward has been identified, populate schedule
+       
+            # Now that a ward has been identified, populate schedule
             overall_slot_index = self.calc_slot_index(ward_id, self.num_weeks, p.start)
             slot_index_increment = overall_slot_index
             for i in range(0, placement_duration):
