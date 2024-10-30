@@ -141,11 +141,11 @@ class Schedule:
         """
         for p in self.placements:
             placement_duration = int(p.duration)
-            invalid_ward = True
-            #print(f'---------------------------------Student: {p.student_name}')
+            #invalid_ward = True
             #list of valid wards
             valid_ward_ids = []
             for ward_id in range(0, len(self.wards) - 1):
+                #Get info about that ward and it's current bookings.
                 slot_index_increment = self.calc_slot_index(
                     ward_id, self.num_weeks, p.start)
                 year_cap = self.id_year_capacity(p, ward_id)
@@ -157,7 +157,7 @@ class Schedule:
                 #If course is Nursing Associate, ensure no placements are assigned
                 #to a ward that cannot accomodate this
                 elif (p.nurse_assoc
-                    and self.ward.nurse_assoc_capacity == 0):
+                      and self.ward.nurse_assoc_capacity == 0):
                     valid_ward = False
                 #If student is not a driver, ensure no placements are assigned
                 #to a ward that would require driving.
@@ -185,56 +185,58 @@ class Schedule:
             if len(valid_ward_ids) == 0:
                 print(f'ERROR: No Valid Wards remaining for {p.student_name}')
                 break
+            #Randomly pick a valid ward.
+            ward_id = random.choice(valid_ward_ids)
 
             # Find a ward which valid based on capacity and education audit
-            while invalid_ward:
-                invalid_ward = False
+            #while invalid_ward:
+                #invalid_ward = False
                 #ward_id = randint(0, len(self.wards) - 1)
-                ward_id = random.choice(valid_ward_ids)
-                slot_index_increment = self.calc_slot_index(
-                    ward_id, self.num_weeks, p.start
-                )
-                #If no capacity for students in that year, then ward is invalid
-                year_cap = self.id_year_capacity(p, ward_id)
+                
+                # slot_index_increment = self.calc_slot_index(
+                #     ward_id, self.num_weeks, p.start
+                # )
+                # #If no capacity for students in that year, then ward is invalid
+                # year_cap = self.id_year_capacity(p, ward_id)
 
-                #If no capacity for students in that year, then ward is invalid
-                if year_cap == 0:
-                    invalid_ward = True
-                #If course is Nursing Associate, ensure no placements are assigned
-                #to a ward that cannot accomodate this
-                elif (p.nurse_assoc
-                    and self.wards[ward_id].nurse_assoc_capacity == 0):
-                    print('Ward invalid as nursing assoc')
-                    invalid_ward = True
-                #If student is not a driver, ensure no placements are assigned
-                #to a ward that would require driving.
-                elif ((not p.is_driver) and (self.wards[ward_id].need_to_drive)):
-                    print('Ward invalid as student is not driver')
-                    invalid_ward = True
-                else:
-                    for i in range(0, placement_duration):
-                        # Check if overall capacity breached or ward has expired education audit
-                        if (
-                            len(self.slots[slot_index_increment])
-                            >= self.wards[ward_id].capacity
-                        ) or (
-                            (p.covid_status == "Low/Medium")
-                            and (self.wards[ward_id].covid_status == "Medium/High")
-                        ):
-                            invalid_ward = True
-                            break
-                        else:
-                            # If overall cap and education audit are fine, check whether year-specific capacity satisfied
-                            same_year_count = 0
-                            for plac in self.slots[slot_index_increment]:
-                                if plac.part == p.part:
-                                    same_year_count += 1
-                            if same_year_count >= year_cap:
-                                invalid_ward = True
-                                break
-                            if invalid_ward:
-                                break
-                        slot_index_increment += 1
+                # #If no capacity for students in that year, then ward is invalid
+                # if year_cap == 0:
+                #     invalid_ward = True
+                # #If course is Nursing Associate, ensure no placements are assigned
+                # #to a ward that cannot accomodate this
+                # elif (p.nurse_assoc
+                #     and self.wards[ward_id].nurse_assoc_capacity == 0):
+                #     print('Ward invalid as nursing assoc')
+                #     invalid_ward = True
+                # #If student is not a driver, ensure no placements are assigned
+                # #to a ward that would require driving.
+                # elif ((not p.is_driver) and (self.wards[ward_id].need_to_drive)):
+                #     print('Ward invalid as student is not driver')
+                #     invalid_ward = True
+                # else:
+                #     for i in range(0, placement_duration):
+                #         # Check if overall capacity breached or ward has expired education audit
+                #         if (
+                #             len(self.slots[slot_index_increment])
+                #             >= self.wards[ward_id].capacity
+                #         ) or (
+                #             (p.covid_status == "Low/Medium")
+                #             and (self.wards[ward_id].covid_status == "Medium/High")
+                #         ):
+                #             invalid_ward = True
+                #             break
+                #         else:
+                #             # If overall cap and education audit are fine, check whether year-specific capacity satisfied
+                #             same_year_count = 0
+                #             for plac in self.slots[slot_index_increment]:
+                #                 if plac.part == p.part:
+                #                     same_year_count += 1
+                #             if same_year_count >= year_cap:
+                #                 invalid_ward = True
+                #                 break
+                #             if invalid_ward:
+                #                 break
+                #         slot_index_increment += 1
        
             # Now that a ward has been identified, populate schedule
             overall_slot_index = self.calc_slot_index(ward_id, self.num_weeks, p.start)
@@ -656,6 +658,7 @@ class Schedule:
         ward_p2_caps = []
         ward_p3_caps = []
         ward_ed_audits = []
+        student_names = []
         placement_names = []
         placement_cohorts = []
         placement_parts = []
@@ -686,6 +689,7 @@ class Schedule:
                     ward_p2_caps.append(p2_ward_cap)
                     ward_p3_caps.append(p3_ward_cap)
                     ward_ed_audits.append(ward_ed_audit)
+                    student_names.append(schedule_placement.student_name)
                     placement_names.append(schedule_placement.name)
                     placement_cohorts.append(schedule_placement.cohort)
                     placement_parts.append(schedule_placement.part)
@@ -696,7 +700,8 @@ class Schedule:
 
         schedule_df = pd.DataFrame(
             {
-                "nurse_name": placement_names,
+                "nurse_name":student_names,
+                "placement_name": placement_names,
                 "nurse_uni_cohort": placement_cohorts,
                 "placement_part": placement_parts,
                 "placement_start": placement_start,
@@ -714,7 +719,7 @@ class Schedule:
         )
 
         schedule_df.sort_values(
-            by=["nurse_name", "placement_start", "placement_week"], inplace=True
+            by=["placement_name", "placement_start", "placement_week"], inplace=True
         )
 
         script_directory = os.path.dirname(os.path.abspath(__file__))
@@ -744,7 +749,7 @@ class Schedule:
         schedule["placement_start_week"] = schedule["placement_week"]
         schedule["nurse_id"] = None
         schedule["block"] = None
-        schedule[["nurse_id", "block"]] = schedule["nurse_name"].str.split(
+        schedule[["nurse_id", "block"]] = schedule["placement_name"].str.split(
             "_", expand=True, n=1
         )
 
@@ -758,26 +763,28 @@ class Schedule:
         ] + pd.to_timedelta(schedule["placement_offset"], unit="d")
         schedule = schedule.drop("placement_offset", axis=1)
 
-        all_assigned_check = schedule[["nurse_name", "block"]]
+        all_assigned_check = schedule[["placement_name", "block"]]
         all_assigned_check = all_assigned_check.drop_duplicates()
         all_assigned_check_df = pd.DataFrame(
-            all_assigned_check.groupby("nurse_name")["block"].count()
+            all_assigned_check.groupby("placement_name")["block"].count()
         )
 
-        placement_list = [p.name for p in self.placements]
-        total_placements_df = pd.DataFrame(placement_list, columns=["placement"])
-        total_placements_df[["nurse_name", "placement_title"]] = total_placements_df[
-            "placement"
+        placement_list = [(p.student_name, p.name) for p in self.placements]
+        total_placements_df = pd.DataFrame(placement_list, columns=["nurse_name", "placement_name"])
+        total_placements_df[["nurse_id", "placement_title"]] = total_placements_df[
+            "placement_name"
         ].str.split("_", expand=True, n=1)
         student_plac_count = pd.DataFrame(
-            total_placements_df.groupby("nurse_name")["placement_title"].count()
+            total_placements_df.groupby(["nurse_name", "nurse_id", "placement_name"])["placement_title"].count()
         ).reset_index()
         plac_count_compare = all_assigned_check_df.merge(
-            student_plac_count, on="nurse_name"
+            student_plac_count, on="placement_name"
         )
         plac_count_compare.columns = [
-            "nurse_id",
+            "placement_name",
             "assigned_count",
+            "nurse_name",
+            "nurse_id",
             "placement_to_be_assigned",
         ]
         num_incorr_num_plac = plac_count_compare[
@@ -798,11 +805,11 @@ class Schedule:
 
         ## Check that all placements are correct length
         placement_length_check = schedule[
-            ["nurse_name", "block", "placement_week", "placement_duration"]
+            ["nurse_name", "placement_name", "block", "placement_week", "placement_duration"]
         ]
         placement_length_check = placement_length_check.drop_duplicates()
         placement_length_check_df = pd.DataFrame(
-            placement_length_check.groupby(["nurse_name", "block"]).agg(
+            placement_length_check.groupby(["nurse_name", "placement_name", "block"]).agg(
                 {"placement_week": "count", "placement_duration": "max"}
             )
         )
@@ -844,7 +851,7 @@ class Schedule:
         ].drop_duplicates()
 
         overall_ward_cap = pd.DataFrame(
-            schedule.groupby(["ward_name", "placement_week"])["nurse_name"].count()
+            schedule.groupby(["ward_name", "placement_week"])["placement_name"].count()
         )
         overall_ward_cap.reset_index(inplace=True)
         overall_ward_cap.columns = ["ward_name", "placement_week", "assigned_students"]
@@ -888,7 +895,7 @@ class Schedule:
 
         # Check whether any of the nurses have duplicate assignments
         ward_assignment = pd.DataFrame(
-            schedule.groupby(["nurse_name", "block"])["ward_name"].nunique()
+            schedule.groupby(["nurse_name", "placement_name", "block"])["ward_name"].nunique()
         )
         ward_assignment.reset_index(inplace=True)
         num_double_booked = ward_assignment[ward_assignment.ward_name > 1].shape[0]
@@ -931,7 +938,7 @@ class Schedule:
         schedule["placement_start_week"] = schedule["placement_week"]
         schedule["nurse_id"] = None
         schedule["block"] = None
-        schedule[["nurse_id", "block"]] = schedule["nurse_name"].str.split(
+        schedule[["nurse_id", "block"]] = schedule["placement_name"].str.split(
             "_", expand=True, n=1
         )
 
@@ -944,7 +951,7 @@ class Schedule:
             "placement_week_date"
         ] + pd.to_timedelta(schedule["placement_offset"], unit="d")
         schedule = schedule.drop("placement_offset", axis=1)
-
+        #TODO: Add student name to the below.
         (
             incorrect_num_plac_rows,
             incorrect_len_rows,
@@ -953,18 +960,19 @@ class Schedule:
         ) = self.schedule_quality_check()
 
         # Student-level ward allocation
-        nurse_sch = schedule[["nurse_id", "placement_week_date", "ward_name"]]
+        nurse_sch = schedule[["nurse_name", "nurse_id", "placement_week_date", "ward_name"]]
         nurse_sch_formatted = (
-            nurse_sch.groupby(["nurse_id", "placement_week_date"])
+            nurse_sch.groupby(["nurse_name", "nurse_id", "placement_week_date"])
             .ward_name.first()
             .unstack()
         )
 
         # Ward-level student allocation
-        ward_sch = schedule[["nurse_id", "placement_week_date", "ward_name"]]
+        ward_sch = schedule[["nurse_name", "nurse_id", "placement_week_date", "ward_name"]]
         ward_sch_formatted = (
             ward_sch.groupby(["ward_name", "placement_week_date"])
-            .agg({"nurse_id": ", ".join})
+            .agg({"nurse_name":", ".join,
+                  "nurse_id": ", ".join})
             .unstack()
         )
 
@@ -1052,6 +1060,7 @@ class Schedule:
         ed_aud_exp = schedule[
             [
                 "nurse_name",
+                "nurse_id",
                 "ward_name",
                 "placement_start",
                 "placement_duration",
