@@ -13,5 +13,6 @@ class Ward:
             self.p2_capacity,
             self.p3_capacity,
             self.nurse_assoc_capacity,
-            self.need_to_drive
+            self.need_to_drive,
+            self.dyad
         ) = listOfInputs

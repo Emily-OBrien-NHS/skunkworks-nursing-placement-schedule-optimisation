@@ -27,6 +27,7 @@ class DataLoader:
         #Convert bool columns to bools
         self.students["is_driver"] = self.students["is_driver"].astype(bool)
         self.ward_data["need_to_drive"] = self.ward_data["need_to_drive"].astype(bool)
+        self.ward_data["DYAD"] = self.ward_data["DYAD"].astype(bool)
 
         self.students["student_name"] = (
             self.students["Forename"].astype(str)
@@ -77,7 +78,7 @@ class DataLoader:
                 "nurse_associate_cap":[0]*self.no_missing
             }
         )
-        self.ward_data = pd.concat([self.ward_data, self.missing_prev_wards])
+        self.ward_data = pd.concat([self.ward_data, self.missing_prev_wards]).reset_index()
 
         # Process ward info
         # Calculate audit expiry date week relative to the earliest placement in the file
@@ -91,9 +92,23 @@ class DataLoader:
             / np.timedelta64(1, "W"),
             0,
         )
+        
         self.ward_data["capacity"] = self.ward_data[["p1_cap", "p2_cap", "p3_cap", "nurse_associate_cap"]].max(
             axis=1
         )
+        #DYAD logic - no year can have more than half capacity
+        for dyad_ward in self.ward_data.loc[self.ward_data['DYAD'].fillna(False)].index:
+            cap, p1, p2, p3 = self.ward_data.loc[dyad_ward, ["capacity", "p1_cap", "p2_cap", "p3_cap"]]
+            #half capacity and round down to ensure no years capacity is more
+            #than half
+            dyad_yr_cap = np.floor(cap/2)
+            if p1 > dyad_yr_cap:
+                self.ward_data.loc[dyad_ward, "p1_cap"] = dyad_yr_cap
+            if p2 > dyad_yr_cap:
+                self.ward_data.loc[dyad_ward, "p2_cap"] = dyad_yr_cap
+            if p3 > dyad_yr_cap:
+                self.ward_data.loc[dyad_ward, "p3_cap"] = dyad_yr_cap
+
         self.ward_data = self.ward_data[
             [
                 "ward_name",
@@ -106,7 +121,8 @@ class DataLoader:
                 "p2_cap",
                 "p3_cap",
                 "nurse_associate_cap",
-                "need_to_drive"
+                "need_to_drive",
+                "DYAD"
             ]
         ]
         self.ward_data.columns = [
@@ -120,7 +136,8 @@ class DataLoader:
             "P2_CAP",
             "P3_CAP",
             "Nurse_Assoc_CAP",
-            "need_to_drive"
+            "need_to_drive",
+            "DYAD"
         ]
 
 
@@ -207,7 +224,8 @@ class DataLoader:
                     row.P2_CAP,
                     row.P3_CAP,
                     row.Nurse_Assoc_CAP,
-                    row.need_to_drive
+                    row.need_to_drive,
+                    row.DYAD
                 ]
             )
             ward_item = Ward(row_contents)

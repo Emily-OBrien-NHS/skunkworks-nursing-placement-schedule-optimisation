@@ -666,6 +666,7 @@ class Schedule:
         placement_start_dates = []
         placement_durations = []
         placement_week = []
+        is_driver = []
         for i in range(0, len(self.slots)):
             ward_index = int(math.floor(i / len(self.placement_slots)))
             week_index = i - (ward_index * self.num_weeks)
@@ -697,12 +698,14 @@ class Schedule:
                     placement_start_dates.append(schedule_placement.start_date)
                     placement_week.append(week_index)
                     placement_durations.append(schedule_placement.duration)
+                    is_driver.append(schedule_placement.is_driver)
 
         schedule_df = pd.DataFrame(
             {
                 "nurse_name":student_names,
                 "placement_name": placement_names,
                 "nurse_uni_cohort": placement_cohorts,
+                "is_driver?" : is_driver,
                 "placement_part": placement_parts,
                 "placement_start": placement_start,
                 "placement_start_date": placement_start_dates,
@@ -1122,5 +1125,20 @@ class Schedule:
             ward_q_util_formatted.to_excel(
                 writer, sheet_name="ward_quarterly_util_schedule"
             )
+
+            ###UHPT Output
+            schedule['placement'] = [i[1].strip() for i in
+                                     schedule['placement_name'].str.split(':')]
+            UHPT_schedule = (schedule[['nurse_uni_cohort', 'placement_part',
+                                      'nurse_id', 'nurse_name', 'is_driver?',
+                                      'placement', 'ward_name']]
+                                      .drop_duplicates()
+                            .pivot(index=['nurse_uni_cohort', 'placement_part',
+                                         'nurse_id', 'nurse_name', 'is_driver?'],
+                                         columns='placement',
+                                         values='ward_name')).reset_index()
+            UHPT_schedule.to_excel(os.path.join(save_directory,
+            f"UHPT_schedule_output_{now}_{self.generation}_{self.viable}.xlsx"),
+            index=False)
 
         return file_name
