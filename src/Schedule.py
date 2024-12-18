@@ -667,6 +667,7 @@ class Schedule:
         placement_durations = []
         placement_week = []
         is_driver = []
+        ward_history = []
         for i in range(0, len(self.slots)):
             ward_index = int(math.floor(i / len(self.placement_slots)))
             week_index = i - (ward_index * self.num_weeks)
@@ -699,6 +700,7 @@ class Schedule:
                     placement_week.append(week_index)
                     placement_durations.append(schedule_placement.duration)
                     is_driver.append(schedule_placement.is_driver)
+                    ward_history.append(schedule_placement.wardhistory)
 
         schedule_df = pd.DataFrame(
             {
@@ -706,6 +708,7 @@ class Schedule:
                 "placement_name": placement_names,
                 "nurse_uni_cohort": placement_cohorts,
                 "is_driver?" : is_driver,
+                "ward_history" : ward_history,
                 "placement_part": placement_parts,
                 "placement_start": placement_start,
                 "placement_start_date": placement_start_dates,
@@ -954,7 +957,6 @@ class Schedule:
             "placement_week_date"
         ] + pd.to_timedelta(schedule["placement_offset"], unit="d")
         schedule = schedule.drop("placement_offset", axis=1)
-        #TODO: Add student name to the below.
         (
             incorrect_num_plac_rows,
             incorrect_len_rows,
@@ -1131,10 +1133,11 @@ class Schedule:
                                      schedule['placement_name'].str.split(':')]
             UHPT_schedule = (schedule[['nurse_uni_cohort', 'placement_part',
                                       'nurse_id', 'nurse_name', 'is_driver?',
-                                      'placement', 'ward_name']]
+                                      'ward_history', 'placement', 'ward_name']]
                                       .drop_duplicates()
                             .pivot(index=['nurse_uni_cohort', 'placement_part',
-                                         'nurse_id', 'nurse_name', 'is_driver?'],
+                                         'nurse_id', 'nurse_name', 'is_driver?',
+                                         'ward_history'],
                                          columns='placement',
                                          values='ward_name')).reset_index()
             UHPT_schedule.to_excel(os.path.join(save_directory,
