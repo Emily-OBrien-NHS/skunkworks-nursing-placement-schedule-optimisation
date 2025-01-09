@@ -1128,19 +1128,18 @@ class Schedule:
                 writer, sheet_name="ward_quarterly_util_schedule"
             )
 
-            ###UHPT Output
-            schedule['placement'] = [i[1].strip() for i in
+        ###UHPT Output
+        schedule['placement'] = [i[1].strip() for i in
                                      schedule['placement_name'].str.split(':')]
-            UHPT_schedule = (schedule[['nurse_uni_cohort', 'placement_part',
-                                      'nurse_id', 'nurse_name', 'is_driver?',
-                                      'ward_history', 'placement', 'ward_name']]
-                                      .drop_duplicates()
+        UHPT_schedule = (schedule[['nurse_uni_cohort', 'placement_part',
+                                   'nurse_id', 'nurse_name', 'is_driver?',
+                                   'ward_history', 'placement', 'ward_name']]
+                                   .drop_duplicates()
                             .pivot(index=['nurse_uni_cohort', 'placement_part',
-                                         'nurse_id', 'nurse_name', 'is_driver?',
-                                         'ward_history'],
-                                         columns='placement',
-                                         values='ward_name')).reset_index()
-            UHPT_schedule.to_excel(os.path.join(save_directory,
+                                          'nurse_id', 'nurse_name', 'is_driver?',
+                                          'ward_history'], columns='placement',
+                                          values='ward_name')).reset_index()
+        UHPT_schedule.to_excel(os.path.join(save_directory,
             f"UHPT_schedule_output_{now}_{self.generation}_{self.viable}.xlsx"),
             index=False)
 

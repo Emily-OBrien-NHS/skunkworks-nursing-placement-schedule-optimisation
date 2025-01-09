@@ -28,6 +28,8 @@ class DataLoader:
         self.students["is_driver"] = self.students["is_driver"].astype(bool)
         self.ward_data["need_to_drive"] = self.ward_data["need_to_drive"].astype(bool)
         self.ward_data["DYAD"] = self.ward_data["DYAD"].astype(bool)
+        #Convert student id to int
+        self.students["student_id"] = self.students["student_id"].astype('Int64')
 
         self.students["student_name"] = (
             self.students["Forename"].astype(str)
@@ -78,6 +80,8 @@ class DataLoader:
                 "nurse_associate_cap":[0]*self.no_missing
             }
         )
+        self.missing_prev_wards["need_to_drive"] = False
+        self.missing_prev_wards["DYAD"] = False
         self.ward_data = pd.concat([self.ward_data, self.missing_prev_wards]).reset_index()
 
         # Process ward info

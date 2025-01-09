@@ -147,6 +147,7 @@ def main(num_schedules: int, pop_size: int):
             scheduleCompareDF.style.highlight_max(axis=0, color="lightgreen")
         )
         logging.info(f"{chosen_schedule.file_name} generated")
+        logging.info(scheduleCompareDF.dtypes)
 
     script_directory = os.path.dirname(os.path.abspath(__file__))
     save_directory = os.path.join(script_directory, "results")
@@ -162,7 +163,8 @@ def main(num_schedules: int, pop_size: int):
     scheduleCompareDF.to_csv(full_save_path)
     logging.info("Comparison file saved")
     viableBool = False
-    if len(scheduleCompareDF[scheduleCompareDF["Viable schedule?"] == True]) > 0:
+    logging.info(scheduleCompareDF.dtypes)
+    if scheduleCompareDF["Viable schedule?"].astype(bool).sum() > 0:
         viableBool = True
     return viableBool
 
@@ -310,7 +312,7 @@ if page == "Run algorithm":
                 )
         ########################REMOVE FOR STREAMLIT!!!!!!!!!!!!!!!!!!!!!!!!!!!
         #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        viableBool = main(num_schedules, numberOfChromosomes)
+        #viableBool = main(num_schedules, numberOfChromosomes)
 
 elif page == "Documentation":
     f = open("README_ui.md", "r")
