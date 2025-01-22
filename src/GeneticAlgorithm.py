@@ -88,7 +88,7 @@ class GeneticAlgorithm:
                 {
                     "schedule": schedule_obj,
                     "fitness": schedule_obj.fitness,
-                    "sched_id": randrange(9999),
+                    "sched_id": randrange(9999)
                 }
             )
 
@@ -170,6 +170,7 @@ class GeneticAlgorithm:
             chosen_schedule,
             schedule_fitnesses,
         ) = self.viable_schedule_check()
+        download_files = Schedule.files
         iter_count = self.status_update()
         if continue_eval:
             continue_eval, chosen_schedule = self.no_change_check()
@@ -177,7 +178,7 @@ class GeneticAlgorithm:
             fitness = self.last_fitness
         else:
             fitness = chosen_schedule.fitness
-        return continue_eval, chosen_schedule, fitness, iter_count, schedule_fitnesses
+        return continue_eval, chosen_schedule, fitness, iter_count, schedule_fitnesses, download_files
 
     def execute_mutation(self):
         """
@@ -271,7 +272,7 @@ class GeneticAlgorithm:
                 {
                     "schedule": schedule_obj,
                     "fitness": schedule_obj.fitness,
-                    "sched_id": randrange(9999),
+                    "sched_id": randrange(9999)
                 }
             )
 
@@ -309,5 +310,6 @@ class GeneticAlgorithm:
             fitness,
             iteration,
             schedule_fitnesses,
+            download_files
         ) = self.evaluate()
         return continue_eval, chosen_schedule, fitness, iteration, schedule_fitnesses

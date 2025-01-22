@@ -8,7 +8,7 @@ import re
 
 
 class DataLoader:
-    def readData(self, filename: str):
+    def readData(self, filename):#filename: str):
         """
         Function to load data from files and do basic preprocessing and prep
 

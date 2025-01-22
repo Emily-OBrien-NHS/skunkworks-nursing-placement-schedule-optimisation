@@ -12,6 +12,9 @@ import yaml
 import os
 import logging
 import random
+import streamlit as st
+import io
+import base64
 
 
 class Schedule:
@@ -31,6 +34,7 @@ class Schedule:
     param: viable: A Boolean initialising the viability of this schedule
     param: non_viable_reason: A None string initialising the explanation for why the schedule is not viable
     """
+    files = []
 
     def __init__(self, slots: list, wards: list, placements: list, num_weeks: int):
         self.conf_placements = []
@@ -927,7 +931,22 @@ class Schedule:
             cap_exceeded_rows,
             double_booked_rows,
         )
+    
+    def uhpt_schedule_output_to_excel(self, df):
+        """
+        Function to create the output UHPT excel file before creating the
+        download link.
 
+        Returns:
+            processed_data : the excel file ready to create the link
+        """
+        output = io.BytesIO()
+        writer = pd.ExcelWriter(output, engine='xlsxwriter')
+        df.to_excel(writer, index=False, sheet_name='Sheet1')
+        writer.close()
+        processed_data = output.getvalue()
+        return processed_data
+    
     def save_report(self) -> str:
         """
         Function to save down the formatted versions of the schedules including
@@ -1092,41 +1111,44 @@ class Schedule:
         now = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
         file_name = f"schedule_output_{now}_{self.generation}_{self.viable}.xlsx"
         self.file_name = file_name
-
-        full_save_path = os.path.join(save_directory, file_name)
-
-        with pd.ExcelWriter(full_save_path) as writer:
-            ed_aud_exp_fail.to_excel(
-                writer, sheet_name="wards_expired_audits", index=False
-            )
+        
+        #Function to make the excel file needed to create the download link
+        #(put within this function for one off use and to save typing out a long
+        #list of data frames)
+        def schedule_output_to_excel():
+            buffer = io.BytesIO()
+            writer = pd.ExcelWriter(buffer, engine='xlsxwriter')
+            ed_aud_exp_fail.to_excel(writer, sheet_name="wards_expired_audits",
+                                     index=False)
             if incorrect_num_plac_rows is not None:
-                incorrect_num_plac_rows.to_excel(
-                    writer, sheet_name="incorrect_num_placements", index=False
-                )
+                incorrect_num_plac_rows.to_excel(writer,
+                                                 sheet_name="incorrect_num_placements",
+                                                 index=False)
             if incorrect_len_rows is not None:
-                incorrect_len_rows.to_excel(
-                    writer, sheet_name="incorrect_len_placements", index=False
-                )
+                incorrect_len_rows.to_excel(writer,
+                                            sheet_name="incorrect_len_placements",
+                                            index=False)
             if cap_exceeded_rows is not None:
-                cap_exceeded_rows.to_excel(
-                    writer, sheet_name="capacity_exceeded", index=False
-                )
+                cap_exceeded_rows.to_excel(writer, sheet_name="capacity_exceeded",
+                                           index=False)
             if double_booked_rows is not None:
-                double_booked_rows.to_excel(
-                    writer, sheet_name="double_booked_students", index=False
-                )
+                double_booked_rows.to_excel(writer, sheet_name="double_booked_students",
+                                            index=False)
             nurse_sch_formatted.to_excel(writer, sheet_name="nurse_schedule")
             ward_sch_formatted.to_excel(writer, sheet_name="ward_schedule")
             ward_hours_sch_formatted.to_excel(writer, sheet_name="ward_hours_schedule")
-            cohort_hours_sch_formatted.to_excel(
-                writer, sheet_name="cohort_hours_schedule"
-            )
-            ward_util_sch_formatted.to_excel(
-                writer, sheet_name="ward_weekly_util_schedule"
-            )
-            ward_q_util_formatted.to_excel(
-                writer, sheet_name="ward_quarterly_util_schedule"
-            )
+            cohort_hours_sch_formatted.to_excel(writer,
+                                                sheet_name="cohort_hours_schedule")
+            ward_util_sch_formatted.to_excel(writer,
+                                             sheet_name="ward_weekly_util_schedule")
+            ward_q_util_formatted.to_excel(writer,
+                                           sheet_name="ward_quarterly_util_schedule")
+            writer.close()
+            output = buffer.getvalue()
+            return output
+        #Append the file and file name to the list of files
+        self.files.append((schedule_output_to_excel(), self.file_name))
+
 
         ###UHPT Output
         schedule['placement'] = [i[1].strip() for i in
@@ -1139,8 +1161,17 @@ class Schedule:
                                           'nurse_id', 'nurse_name', 'is_driver?',
                                           'ward_history'], columns='placement',
                                           values='ward_name')).reset_index()
-        UHPT_schedule.to_excel(os.path.join(save_directory,
-            f"UHPT_schedule_output_{now}_{self.generation}_{self.viable}.xlsx"),
-            index=False)
+        #Append the file and file name to the list of files
+        self.files.append((self.uhpt_schedule_output_to_excel(UHPT_schedule),
+                           f"UHPT_schedule_output_{now}_{self.generation}_{self.viable}.xlsx"))
 
         return file_name
+    
+    def create_download_link(val, filename):
+        """Function to create a download link for the generated file.  Doing
+        it this way stops streamlit from refreshing the whole page.
+        Returns:
+            : file download link
+        """
+        b64 = base64.b64encode(val)
+        return f'<a href="data:application/octet-stream;base64,{b64.decode()}" download="{filename}.csv">Download {filename}</a>'
