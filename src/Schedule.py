@@ -1174,4 +1174,4 @@ class Schedule:
             : file download link
         """
         b64 = base64.b64encode(val)
-        return f'<a href="data:application/octet-stream;base64,{b64.decode()}" download="{filename}.csv">Download {filename}</a>'
+        return f'<a href="data:application/octet-stream;base64,{b64.decode()}" download="{filename}">Download {filename}</a>'
