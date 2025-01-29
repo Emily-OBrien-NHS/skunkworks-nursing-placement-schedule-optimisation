@@ -151,7 +151,7 @@ st.image("docs/Uhp.png")
 st.title("Nursing Placement Optimisation")
 
 link = "https://github.com/nhsx/skunkworks-nursing-placement-schedule-optimisation"
-st.markdown("This Nuse Placement tool is adapted from the NHS AI (Artificial Intelligence) Lab Skunkworks team's original scheduler for use at UHPT.  The original code repo can be [found here](%s)"%link)
+st.markdown("This nuse placement tool is adapted from the NHS AI (Artificial Intelligence) Lab Skunkworks team's original scheduler for use at UHPT.  The original code repo can be [found here](%s)"%link)
 
 #Select box for algorithm/documentaion
 page = st.selectbox("Choose your page", ["Run algorithm", "Create student input sheet", "Documentation"])
@@ -177,12 +177,12 @@ if page == "Run algorithm":
     #else use the file upload
     elif file_source == "Your own data":
         # From the config file, get the name of the file containing the input data
-        uploaded_file = st.file_uploader("Choose a file")
-        if uploaded_file is not None:
+        uploaded_input_file = st.file_uploader("Choose a file")
+        if uploaded_input_file is not None:
             try:
-                dataload.readData(uploaded_file)
+                dataload.readData(uploaded_input_file)
             except FileNotFoundError:
-                logging.exception(f"No file found by the name {uploaded_file} in the data directory")
+                logging.exception(f"No file found by the name {uploaded_input_file} in the data directory")
 
             #Get the student start dates
             student_placement_starts = dataload.student_placements["placement_start_date_raw"]
@@ -325,16 +325,16 @@ if page == "Run algorithm":
         
 
 elif page == "Create student input sheet":
-    uploaded_file = st.file_uploader("Choose a file")
-    if uploaded_file is not None:
+    uploaded_student_file = st.file_uploader("Choose a file")
+    if uploaded_student_file is not None:
         try:
             create_inputs = StudentTab()
-            student_tab = create_inputs.create_student_tab(uploaded_file)
+            student_tab = create_inputs.create_student_tab(uploaded_student_file)
             download_link = Schedule.create_download_link(student_tab, "Student Tab.xlsx")
             st.markdown(download_link, unsafe_allow_html=True)
         except FileNotFoundError:
             st.error("Some issue in input file. Please ensure it follows the correct format.")
-            logging.exception(f"No file found by the name {uploaded_file} in the data directory")
+            logging.exception(f"No file found by the name {uploaded_student_file} in the data directory")
     else:
         st.warning("you need to upload an excel file.")
 
