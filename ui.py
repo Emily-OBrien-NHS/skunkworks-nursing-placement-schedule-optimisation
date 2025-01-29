@@ -154,7 +154,7 @@ link = "https://github.com/nhsx/skunkworks-nursing-placement-schedule-optimisati
 st.markdown("This nuse placement tool is adapted from the NHS AI (Artificial Intelligence) Lab Skunkworks team's original scheduler for use at UHPT.  The original code repo can be [found here](%s)"%link)
 
 #Select box for algorithm/documentaion
-page = st.selectbox("Choose your page", ["Run algorithm", "Create student input sheet", "User Instructions", "Documentation"])
+page = st.selectbox("Choose your page", ["Run algorithm", "Create student input sheet", "Usage Instructions", "Documentation"])
 
 if page == "Run algorithm":
     dataload = DataLoader()
