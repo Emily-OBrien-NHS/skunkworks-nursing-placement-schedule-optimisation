@@ -5,3 +5,4 @@ openpyxl
 pyyaml
 matplotlib
 pybase64
+xlsxwriter
