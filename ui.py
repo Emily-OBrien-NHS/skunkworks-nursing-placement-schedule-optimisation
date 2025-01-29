@@ -344,5 +344,4 @@ elif page == "Usage Instructions":
 
 elif page == "Documentation":
     f = open("README_ui.md", "r")
-    st.markdown("""## Overview
-This is an application taken from [skunkworks nurse scheduler](https://github.com/nhsx/skunkworks-nursing-placement-schedule-optimisation) and has been adapted for use at UHPT.""")
+    st.markdown(f.read())
