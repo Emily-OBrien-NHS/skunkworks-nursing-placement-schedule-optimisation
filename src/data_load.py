@@ -98,7 +98,7 @@ class DataLoader:
             0,
         )
         
-        self.ward_data["capacity"] = self.ward_data[["p1_cap", "p2_cap", "p3_cap", "nurse_associate_cap"]].max(
+        self.ward_data["capacity"] = self.ward_data[["capacity_num", "p1_cap", "p2_cap", "p3_cap", "nurse_associate_cap"]].max(
             axis=1
         )
         #DYAD logic - no year can have more than half capacity
