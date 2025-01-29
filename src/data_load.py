@@ -3,10 +3,7 @@ import numpy as np
 from src.Slot import Slot
 from src.Ward import Ward
 from src.Placement import Placement
-import time
 import re
-import streamlit as st
-
 
 class DataLoader:
     def readData(self, filename):#filename: str):
