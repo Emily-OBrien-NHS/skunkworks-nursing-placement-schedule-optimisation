@@ -78,7 +78,7 @@
                     "name": "university",
                     "description": "University of study",
                     "type": "string",
-                    "Example": "UniversityA"
+                    "Example": "University of Plymouth"
                 }
             ],
             "qualification": [
@@ -86,7 +86,7 @@
                     "name": "qualification",
                     "description": "Qualification the student is studying for",
                     "type": "string",
-                    "Example": "BSc"
+                    "Example": "Adult Nursing Bsc"
                 }
             ],
 
@@ -95,7 +95,7 @@
                     "name": "course_start",
                     "description": "Date the student started the course",
                     "type": "datetime",
-                    "Example": "01/01/1990"
+                    "Example": "Sep-24"
                 }
             ],
 
@@ -103,8 +103,8 @@
                 {
                     "name": "year",
                     "description": "Year of study",
-                    "type": "int64",
-                    "Example": "1"
+                    "type": "string",
+                    "Example": "Year 1"
                 }
             ],
             "prev_placements": [
@@ -215,6 +215,14 @@
                 {
                     "name": "need_to_drive",
                     "description": "Flag for remote wards that require student to drive/own a car",
+                    "type": "bool",
+                    "Example": "True"
+                }
+            ],
+            "DYAD": [
+                {
+                    "name": "DYAD",
+                    "description": "Flag for if a ward is DYAD and could therefore take more students, so long as balaced across the years",
                     "type": "bool",
                     "Example": "True"
                 }

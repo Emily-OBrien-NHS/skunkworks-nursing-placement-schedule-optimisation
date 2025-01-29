@@ -20,13 +20,11 @@ Special thanks to Imperial College Healthcare NHS Trust who were pivotal in prov
 
 ## Placement Optimisation tool
 
-The tool is presented as a web-based app, running in your web browser. The tool requires data to be in a specific format (see [Data Dictionary](config/input_data_dictionary.json)). When run, the tool ingests the data saved in the 'data' folder and converts it to the required format. With the data prepared, the tool runs the genetic algorithm which is implemented within it, and returns a number of schedules pre-specified by the user. The schedules are accompanied by a scoring document which score various aspects of each schedule for comparison against one another (for additional details, see the [UI documentation](docs/UI.md)). 
+The tool is presented as a web-based app, running in your web browser. The tool requires data to be in a specific format (see [Data Dictionary](https://github.com/Emily-OBrien-NHS/skunkworks-nursing-placement-schedule-optimisation/blob/main/config/input_data_dictionary.json)). When run, the tool takes the uploaded input file and converts it to the required format. With the data prepared, the tool runs the genetic algorithm which is implemented within it, and returns a number of schedules pre-specified by the user. The schedules are accompanied by a scoring document which score various aspects of each schedule for comparison against one another (for additional details, see the [UI documentation](https://github.com/Emily-OBrien-NHS/skunkworks-nursing-placement-schedule-optimisation/blob/main/docs/UI.md)). 
 
 The schedules themselves consist of a number of tabs which enable views from the perspective of both the student and the ward, as well as reporting-based schedules which show hours and utilisation rate for each working week that the schedule covers. The schedules that are produced are different solutions or options to the same problem for the same set of students. In other words, they are different versions of the same schedule.
 
 By producing a variety of schedules which are each strong in slightly different areas, the tool provides placement coordinators with a strong baseline on which the coordinator can impart their knowledge to get the best learning outcomes for the students, and the best allocation of students for the trust.
-
-(For a diagram of how the algorithm works, please see `nursing_opt_tool_overview.png` in the `docs` folder)
 
 Within the src code files (`src/`), the classes and functions have been given docstrings to provide more specific information around what each piece of functionality does. Please see there for additional information on how the algorithm works.
 
@@ -76,12 +74,15 @@ The basic process for the algorithm is as follows:
 The rules implemented in the tool are can be found in the Constraints documentation (Found in docs/constraints.md)
 
 ## NHS AI Lab Skunkworks
-The project is carried out by the NHS AI Lab Skunkworks, which exists within the NHS AI Lab to support the health and care community to rapidly progress ideas from the conceptual stage to a proof of concept.
+The project was adapted from the work carried out by the NHS AI Lab Skunkworks, which exists within the NHS AI Lab to support the health and care community to rapidly progress ideas from the conceptual stage to a proof of concept.
 
 Find out more about the [NHS AI Lab Skunkworks](https://www.nhsx.nhs.uk/ai-lab/ai-lab-programmes/skunkworks/).
 Join our [Virtual Hub](https://future.nhs.uk/connect.ti/system/text/register) to hear more about future problem-sourcing event opportunities.
 Get in touch with the Skunkworks team at [aiskunkworks@nhsx.nhs.uk](aiskunkworks@nhsx.nhs.uk).
 
+For any issues with this UHPT version of the scheduler, please contact Emily O'Brien at e.obrien6@nhs.net
+
 ## Acknowledgements
-This tool is developed, in part, based on [GASchedule.py](https://github.com/mcychan/GASchedule.py) which was used as a starting point for this project
+This tool is adapted from the skunkworks [initial scheduler](https://github.com/nhsx/skunkworks-nursing-placement-schedule-optimisation)
+which was, in part, based on [GASchedule.py](https://github.com/mcychan/GASchedule.py) which was used as a starting point for this project
 

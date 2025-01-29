@@ -154,7 +154,7 @@ link = "https://github.com/nhsx/skunkworks-nursing-placement-schedule-optimisati
 st.markdown("This nuse placement tool is adapted from the NHS AI (Artificial Intelligence) Lab Skunkworks team's original scheduler for use at UHPT.  The original code repo can be [found here](%s)"%link)
 
 #Select box for algorithm/documentaion
-page = st.selectbox("Choose your page", ["Run algorithm", "Create student input sheet", "Documentation"])
+page = st.selectbox("Choose your page", ["Run algorithm", "Create student input sheet", "User Instructions", "Documentation"])
 
 if page == "Run algorithm":
     dataload = DataLoader()
@@ -182,7 +182,7 @@ if page == "Run algorithm":
             try:
                 dataload.readData(uploaded_input_file)
             except FileNotFoundError:
-                logging.exception(f"No file found by the name {uploaded_input_file} in the data directory")
+                logging.exception(f"Issue with uploaded file {uploaded_input_file}, is this the correct input file?")
 
             #Get the student start dates
             student_placement_starts = dataload.student_placements["placement_start_date_raw"]
@@ -338,6 +338,11 @@ elif page == "Create student input sheet":
     else:
         st.warning("you need to upload an excel file.")
 
+elif page == "Usage Instructions":
+    f = open("README_usage_instructions.md", "r")
+    st.markdown(f.read())
+
 elif page == "Documentation":
     f = open("README_ui.md", "r")
-    st.markdown(f.read())
+    st.markdown("""## Overview
+This is an application taken from [skunkworks nurse scheduler](https://github.com/nhsx/skunkworks-nursing-placement-schedule-optimisation) and has been adapted for use at UHPT.""")
