@@ -4,4 +4,3 @@ streamlit
 openpyxl
 pyyaml
 matplotlib
-pybase64
