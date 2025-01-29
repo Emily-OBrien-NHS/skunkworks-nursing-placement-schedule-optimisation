@@ -4,5 +4,5 @@ streamlit
 openpyxl
 pyyaml
 matplotlib
-base64
+pybase64
 io
