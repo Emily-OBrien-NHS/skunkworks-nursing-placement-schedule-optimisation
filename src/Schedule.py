@@ -1157,7 +1157,7 @@ class Schedule:
                                         'nurse_id', 'nurse_name', 'is_driver?',
                                         'ward_history', 'placement'],
                                         as_index=False)['ward_name']
-                                        .transform(lambda x: ','.join(x))
+                                        .apply(','.join).reset_index()
                                         .pivot(index=['nurse_uni_cohort',
                                                'placement_part', 'nurse_id',
                                                'nurse_name', 'is_driver?',
