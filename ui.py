@@ -154,10 +154,16 @@ st.title("Nursing Placement Optimisation")
 
 link = "https://github.com/nhsx/skunkworks-nursing-placement-schedule-optimisation"
 st.markdown("This nuse placement tool is adapted from the NHS AI (Artificial Intelligence) Lab Skunkworks team's original scheduler for use at UHPT.  The original code repo can be [found here](%s)"%link)
-st.markdown(Schedule.create_download_link(InputTemplate.create_input_template(), "Input Template.xlsx"), unsafe_allow_html=True)
+with st.popover("Usage Instructions"):
+    f = open("README_usage_instructions.md", "r")
+    st.markdown(f.read())
+with st.popover("Input File Details"):
+    f = open("README_input_columns.md", "r")
+    st.markdown(f.read())
 
+st.markdown(Schedule.create_download_link(InputTemplate.create_input_template(), "Input Template.xlsx"), unsafe_allow_html=True)
 #Select box for algorithm/documentaion
-page = st.selectbox("Choose your page", ["Run algorithm", "Create student input sheet", "Usage Instructions", "Documentation"])
+page = st.selectbox("Choose your page", ["Run algorithm", "Create Student Input Sheet", "Documentation"])
 
 if page == "Run algorithm":
     dataload = DataLoader()
@@ -326,7 +332,7 @@ if page == "Run algorithm":
         st.warning("you need to upload an excel file.")
         
 
-elif page == "Create student input sheet":
+elif page == "Create Student Input Sheet":
     uploaded_student_file = st.file_uploader("Choose a file")
     if uploaded_student_file is not None:
         try:
@@ -339,10 +345,6 @@ elif page == "Create student input sheet":
             logging.exception(f"No file found by the name {uploaded_student_file} in the data directory")
     else:
         st.warning("you need to upload an excel file.")
-
-elif page == "Usage Instructions":
-    f = open("README_usage_instructions.md", "r")
-    st.markdown(f.read())
 
 elif page == "Documentation":
     f = open("README_ui.md", "r")
