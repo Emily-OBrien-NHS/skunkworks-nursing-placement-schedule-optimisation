@@ -171,160 +171,157 @@ if page == "Run algorithm":
                                ["Your own data", "Fake data"])
     #If fake data read in that
     if file_source == "Fake data":
-        try:
-            fake_data = FakeData
-            st.markdown(fake_data.fake_data_download_link, unsafe_allow_html=True)
-            dataload.readData(fake_data.fake_data_file)
-        except FileNotFoundError:
-            logging.exception(f"No fake_data.xlsx file found in the data directory")
+        fake_data = FakeData
+        st.markdown(fake_data.fake_data_download_link, unsafe_allow_html=True)
+        input_file = fake_data.fake_data_file
     #else use the file upload
     elif file_source == "Your own data":
         # From the config file, get the name of the file containing the input data
-        uploaded_input_file = st.file_uploader("Choose a file")
-        if uploaded_input_file is not None:
-            try:
-                dataload.readData(uploaded_input_file)
-            except FileNotFoundError:
-                logging.exception(f"Issue with uploaded file {uploaded_input_file}, is this the correct input file?")
+        input_file = st.file_uploader("Choose a file")
+    if input_file is not None:
+        try:
+            dataload.readData(input_file)
+        except FileNotFoundError:
+            logging.exception(f"Issue with uploaded file {input_file}, is this the correct input file?")
 
-            #Get the student start dates
-            student_placement_starts = dataload.student_placements["placement_start_date_raw"]
-            student_placement_ends = dataload.student_placements["placement_start_date_raw"] + pd.to_timedelta(dataload.student_placements["placement_len_weeks"], unit='w')
-            #get start and end date
-            start_date = st.date_input("Start Date",
+        #Get the student start dates
+        student_placement_starts = dataload.student_placements["placement_start_date_raw"]
+        student_placement_ends = dataload.student_placements["placement_start_date_raw"] + pd.to_timedelta(dataload.student_placements["placement_len_weeks"], unit='w')
+        #get start and end date
+        start_date = st.date_input("Start Date",
                                     value=pd.to_datetime(min(student_placement_starts),
                                                             format="%Y-%m-%d"),)
-            end_date = st.date_input("End Date",
+        end_date = st.date_input("End Date",
                                     value=pd.to_datetime(max(student_placement_ends),
                                                         format="%Y-%m-%d"),)
-            #show error if start date is before end, else filter placements to between
-            #start and end.
-            if start_date >= end_date:
-                st.error(f"Start date comes after or on the same day as the end date, please correct before proceeding")
-                logging.exception("Start date comes after or on the same day as the end date, please correct before proceeding")
-            else:
-                dataload.student_placements = dataload.student_placements[
-                    (pd.to_datetime(dataload.student_placements.placement_start_date_raw
-                                    ).dt.date >= start_date)
-                    & (pd.to_datetime(dataload.student_placements.placement_start_date_raw
-                                    ).dt.date < end_date)]
-                #Get user input for number of schedules
-                schedule_num = st.empty()
-                num_schedules = st.slider("Choose number of schedules to generate",
-                                        min_value=1, max_value=10, value=2, step=1,
-                                        help="Note that once you click the Run button below, moving this slider again with cancel the program")
+        #show error if start date is before end, else filter placements to between
+        #start and end.
+        if start_date >= end_date:
+            st.error(f"Start date comes after or on the same day as the end date, please correct before proceeding")
+            logging.exception("Start date comes after or on the same day as the end date, please correct before proceeding")
+        else:
+            dataload.student_placements = dataload.student_placements[
+                (pd.to_datetime(dataload.student_placements.placement_start_date_raw
+                                ).dt.date >= start_date)
+                & (pd.to_datetime(dataload.student_placements.placement_start_date_raw
+                                ).dt.date < end_date)]
+            #Get user input for number of schedules
+            schedule_num = st.empty()
+            num_schedules = st.slider("Choose number of schedules to generate",
+                                      min_value=1, max_value=10, value=2, step=1,
+                                      help="Note that once you click the Run button below, moving this slider again with cancel the program")
                 
-                #Table to flag if more students than placements
-                st.header("Student and Capacity Counts")
-                student_counts = dataload.students["year"].value_counts()
-                counts = [student_counts.sum()]
-                for year in ["Year 1", "Year 2", "Year 3"]:
-                    if year in student_counts.index:
-                        counts.append(student_counts[year])
-                    else:
-                        counts.append(0)
+            #Table to flag if more students than placements
+            st.header("Student and Capacity Counts")
+            student_counts = dataload.students["year"].value_counts()
+            counts = [student_counts.sum()]
+            for year in ["Year 1", "Year 2", "Year 3"]:
+                if year in student_counts.index:
+                    counts.append(student_counts[year])
+                else:
+                    counts.append(0)
                 
-                ward_capacities = pd.DataFrame((dataload.ward_data[
-                                ["capacity","P1_CAP", "P2_CAP", "P3_CAP"]]
-                                .rename(columns={"capacity":"Total",
+            ward_capacities = pd.DataFrame((dataload.ward_data[
+                              ["capacity","P1_CAP", "P2_CAP", "P3_CAP"]]
+                              .rename(columns={"capacity":"Total",
                                                     "P1_CAP":"Year 1",
                                                     "P2_CAP":"Year 2",
                                                     "P3_CAP":"Year 3"})).sum())
-                ward_capacities["Student Count"] = counts
-                ward_capacities.columns = ["Ward Capacity", "Student Count"]
-                st.dataframe(ward_capacities)
-                too_many_students = ward_capacities.loc[ward_capacities["Student Count"]
+            ward_capacities["Student Count"] = counts
+            ward_capacities.columns = ["Ward Capacity", "Student Count"]
+            st.dataframe(ward_capacities)
+            too_many_students = ward_capacities.loc[ward_capacities["Student Count"]
                                             > ward_capacities["Ward Capacity"]].copy()
-                if len(too_many_students) > 0:
-                    for group, row in too_many_students.iterrows():
-                        ward_cap = row["Ward Capacity"]
-                        no_stud = row["Student Count"]
-                        group = group if group != "Total" else "all"
-                        st.error(f"Not enough capacity for {group} students:  there are {no_stud} students and only {ward_cap} placements for {group} students.  Not all students can be placed.")
-                else:
-                    st.info("Enough capacity for all students")
+            if len(too_many_students) > 0:
+                for group, row in too_many_students.iterrows():
+                    ward_cap = row["Ward Capacity"]
+                    no_stud = row["Student Count"]
+                    group = group if group != "Total" else "all"
+                    st.error(f"Not enough capacity for {group} students:  there are {no_stud} students and only {ward_cap} placements for {group} students.  Not all students can be placed.")
+            else:
+                st.info("Enough capacity for all students")
 
-                #Flag any mismatched courses
-                st.header("Mismatched Courses")
-                student_cohorts = dataload.students[
+            #Flag any mismatched courses
+            st.header("Mismatched Courses")
+            student_cohorts = dataload.students[
                                 ["university", "qualification", "course_start",
                                 "student_cohort"]].value_counts().reset_index()
-                placement_cohorts = dataload.uni_placements[
+            placement_cohorts = dataload.uni_placements[
                                     ["university", "qualification", "course_start",
                                     "student_cohort"]]
-                cohorts = student_cohorts.merge(placement_cohorts, on="student_cohort",
+            cohorts = student_cohorts.merge(placement_cohorts, on="student_cohort",
                                     how="outer", suffixes=["_student", "_placement"])
-                students_no_place = cohorts.loc[cohorts["university_placement"].isna(),
+            students_no_place = cohorts.loc[cohorts["university_placement"].isna(),
                                     ["university_student", "qualification_student",
                                     "course_start_student", "student_cohort",
                                     "count"]].copy()
-                if len(students_no_place) > 0:
-                    #If students on a course with no matching placement.
-                    no_stud = int(students_no_place["count"].sum())
-                    st.error(f"There are {no_stud} students on courses which don't have a matching placement in the placements tab. Please double check for any typos, spelling errors, extra spaces or add their course to the placements tab, otherwise these students cannot be placed.")
-                    for idx, row in students_no_place.iterrows():
-                        students = dataload.students.loc[
-                        dataload.students["student_cohort"] == row["student_cohort"],
-                        ["Forename", "Surname"]].agg(" ".join, axis=1)
-                        student_names = ", ".join(students.tolist())
-                        st.warning(f"The below course is missng from the placemets tab, but has the following students: {student_names}")
-                        st.dataframe(pd.DataFrame(
+            if len(students_no_place) > 0:
+                #If students on a course with no matching placement.
+                no_stud = int(students_no_place["count"].sum())
+                st.error(f"There are {no_stud} students on courses which don't have a matching placement in the placements tab. Please double check for any typos, spelling errors, extra spaces or add their course to the placements tab, otherwise these students cannot be placed.")
+                for idx, row in students_no_place.iterrows():
+                    students = dataload.students.loc[
+                    dataload.students["student_cohort"] == row["student_cohort"],
+                    ["Forename", "Surname"]].agg(" ".join, axis=1)
+                    student_names = ", ".join(students.tolist())
+                    st.warning(f"The below course is missng from the placemets tab, but has the following students: {student_names}")
+                    st.dataframe(pd.DataFrame(
                             {"University":row["university_student"],
                             "Qualification":row["qualification_student"],
                             "Course Start":row["course_start_student"]}, index=[""]))
                 
-                place_no_stude = cohorts.loc[cohorts["university_student"].isna(),
+            place_no_stude = cohorts.loc[cohorts["university_student"].isna(),
                                     ["university_placement", "qualification_placement",
                                     "course_start_placement"]].copy()
-                if len(place_no_stude):
-                    #If there are placements with no students, flag these in case there should be
-                    st.error("The below courses are in the placements tab but have no students. Please double check for any typos, spelling errors or extra spaces if you believe there should be students on these courses:")
-                    st.dataframe(place_no_stude)
+            if len(place_no_stude):
+                #If there are placements with no students, flag these in case there should be
+                st.error("The below courses are in the placements tab but have no students. Please double check for any typos, spelling errors or extra spaces if you believe there should be students on these courses:")
+                st.dataframe(place_no_stude)
 
-                if (len(students_no_place) == 0) and (len(place_no_stude) == 0):
-                    st.info("All courses match between the Student and Placment tabs")
+            if (len(students_no_place) == 0) and (len(place_no_stude) == 0):
+                st.info("All courses match between the Student and Placment tabs")
 
-                #Show which wards have expired or soon to expire audits
-                st.header("Ward Audit Expiry")
-                expire_wards_string = ""
-                expire_wards = dataload.ward_data.loc[
+            #Show which wards have expired or soon to expire audits
+            st.header("Ward Audit Expiry")
+            expire_wards_string = ""
+            expire_wards = dataload.ward_data.loc[
                     pd.to_datetime(dataload.ward_data.education_audit_exp).dt.date
                     <= start_date, "Ward"]
-                for item in list(expire_wards):
-                    expire_wards_string = expire_wards_string + item + ", "
+            for item in list(expire_wards):
+                expire_wards_string = expire_wards_string + item + ", "
 
-                going_to_expire_wards_string = ""
-                going_to_expire_wards = dataload.ward_data.loc[
+            going_to_expire_wards_string = ""
+            going_to_expire_wards = dataload.ward_data.loc[
                     (pd.to_datetime(dataload.ward_data.education_audit_exp).dt.date
                     <= end_date)
                     & (pd.to_datetime(dataload.ward_data.education_audit_exp).dt.date
                     > start_date), "Ward"]
-                for item in list(going_to_expire_wards):
-                    going_to_expire_wards_string = going_to_expire_wards_string + item + ", "
+            for item in list(going_to_expire_wards):
+                going_to_expire_wards_string = going_to_expire_wards_string + item + ", "
 
-                if len(expire_wards_string) > 0:
-                    st.error(f"Be aware that the following wards have Education Audits which expire on or before the start date of your schedules:\n {expire_wards_string}")
-                    logging.warning(f"Be aware that the following wards have Education Audits which expire on or before the start date of your schedules: {expire_wards_string}")
-                if len(going_to_expire_wards_string) > 0:
-                    st.warning(f"Additionally, be aware that the following wards have Education Audits which expire on or before the end date of your schedules:\n {going_to_expire_wards_string}")
-                    logging.warning(f"Additionally, be aware that the following wards have Education Audits which expire on or before the end date of your schedules: {going_to_expire_wards_string}")
-                if (len(expire_wards_string) == 0) and (len(going_to_expire_wards_string) == 0):
-                    st.info("All ward audits are up to date")
+            if len(expire_wards_string) > 0:
+                st.error(f"Be aware that the following wards have Education Audits which expire on or before the start date of your schedules:\n {expire_wards_string}")
+                logging.warning(f"Be aware that the following wards have Education Audits which expire on or before the start date of your schedules: {expire_wards_string}")
+            if len(going_to_expire_wards_string) > 0:
+                st.warning(f"Additionally, be aware that the following wards have Education Audits which expire on or before the end date of your schedules:\n {going_to_expire_wards_string}")
+                logging.warning(f"Additionally, be aware that the following wards have Education Audits which expire on or before the end date of your schedules: {going_to_expire_wards_string}")
+            if (len(expire_wards_string) == 0) and (len(going_to_expire_wards_string) == 0):
+                st.info("All ward audits are up to date")
 
-                run_button = st.empty()
-                end_message = st.empty()
-                if run_button.button("Click here to start running"):
-                    viableBool = main(num_schedules, numberOfChromosomes)
-                    if viableBool:
-                        st.balloons()
-                        end_message.success("Schedule production complete!")
-                    else:
-                        end_message.error("Schedule production complete, no viable schedules found")
+            run_button = st.empty()
+            end_message = st.empty()
+            if run_button.button("Click here to start running"):
+                viableBool = main(num_schedules, numberOfChromosomes)
+                if viableBool:
+                    st.balloons()
+                    end_message.success("Schedule production complete!")
+                else:
+                    end_message.error("Schedule production complete, no viable schedules found")
                 ########################REMOVE FOR STREAMLIT!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 #viableBool = main(num_schedules, numberOfChromosomes)
-        else:
-            st.warning("you need to upload an excel file.")
+    else:
+        st.warning("you need to upload an excel file.")
         
 
 elif page == "Create student input sheet":
