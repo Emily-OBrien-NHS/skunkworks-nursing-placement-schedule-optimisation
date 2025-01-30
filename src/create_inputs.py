@@ -6,8 +6,7 @@ import json
 import io
 
 class InputTemplate:
-    def create_input_template(self):
-
+    def create_input_template():
                 # Load fake_data_description.json to get columns required for training data
         with open("config/input_data_dictionary.json", "r") as file:
             data_columns = json.load(file)
