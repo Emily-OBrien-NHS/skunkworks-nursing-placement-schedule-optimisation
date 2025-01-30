@@ -7,20 +7,24 @@ import io
 
 class InputTemplate:
     def create_input_template():
-                # Load fake_data_description.json to get columns required for training data
-        with open("config/input_data_dictionary.json", "r") as file:
-            data_columns = json.load(file)
-
         # Create dataframe with original data fields
-        student_columns = [x["name"] for x in data_columns["students"]["fields"]]
+        student_columns = ["student_id", "Forename", "Surname",	"university",
+                           "qualification", "course_start", "year",
+                           "prev_placements", "is_driver",
+                           "allowable_covid_status"]
         student_df = pd.DataFrame(columns=student_columns)
         # Create dataframe with original data fields
-        ward_columns = [x["name"] for x in data_columns["wards"]["fields"]]
+        ward_columns = ["ward_name", "ward_speciality",	"education_audit_exp",
+                        "covid_status", "capacity_num", "p1_cap", "p2_cap",
+                        "p3_cap", "nurse_associate_cap",	"need_to_drive",
+                        "DYAD"]
         ward_df = pd.DataFrame(columns=ward_columns)
         # Create dataframe with original data fields
-        placement_columns = [x["name"] for x in data_columns["placements"]["fields"]]
+        placement_columns = ["university", "qualification",	"course_start",
+                             "placement_name", "placement_start_date",
+                             "placement_len_weeks"]
         placement_df = pd.DataFrame(columns=placement_columns)
-
+        #create excel file
         output = io.BytesIO()
         writer = pd.ExcelWriter(output, engine='xlsxwriter')
         student_df.to_excel(writer, sheet_name="students", index=False)
