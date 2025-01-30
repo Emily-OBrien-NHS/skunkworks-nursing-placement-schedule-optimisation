@@ -173,6 +173,7 @@ if page == "Run algorithm":
     if file_source == "Fake data":
         try:
             fake_data = FakeData
+            st.markdown(fake_data.fake_data_download_link, unsafe_allow_html=True)
             dataload.readData(fake_data.fake_data_file)
         except FileNotFoundError:
             logging.exception(f"No fake_data.xlsx file found in the data directory")
