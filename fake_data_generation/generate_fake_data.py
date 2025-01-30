@@ -132,5 +132,5 @@ class FakeData():
         processed_data = output.getvalue()
         return processed_data
 
-    fake_data_download = fake_data_excel_file(student_df, ward_df, placement_df)
-    fake_data_download_link = Schedule.create_download_link(fake_data_download)
+    fake_data_file = fake_data_excel_file(student_df, ward_df, placement_df)
+    fake_data_download_link = Schedule.create_download_link(fake_data_file)
