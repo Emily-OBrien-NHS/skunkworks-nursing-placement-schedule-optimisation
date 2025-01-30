@@ -50,10 +50,10 @@
             "CourseStartDate2"
         ],
         "placement_name": [
-            "Placement1",
-            "Placement2",
-            "Placement3",
-            "Placement4"
+            "YearA: Placement1",
+            "YearA: Placement2",
+            "YearB: Placement1",
+            "YearB: Placement2"
         ],
         "placement_start_date": [
             "2121-05-01",

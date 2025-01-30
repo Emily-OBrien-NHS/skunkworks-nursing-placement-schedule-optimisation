@@ -107,8 +107,8 @@ class FakeData():
     # Remaining fields to fill in so they are not null
     # fields requiring int:
     student_df["student_id"] = [random.randint(10000, 99999) for i in range(args.number_of_students)]
-    student_df["Forename"] = ["Forename" + str(i) for i in range(args.number_of_students)]
-    student_df["Surname"] = ["Surname" + str(i) for i in range(args.number_of_students)]
+    student_df["Forename"] = ["Forename " + str(i) for i in range(args.number_of_students)]
+    student_df["Surname"] = ["Surname " + str(i) for i in range(args.number_of_students)]
     student_df["is_driver"] = random.choices([True, False], weights=[0.75, 0.25], k=args.number_of_students)
     student_df["prev_placements"] = [[] for i in range(args.number_of_students)]
 
