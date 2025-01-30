@@ -115,8 +115,8 @@ class FakeData():
     ward_df["ward_name"] = ["Ward" + str(i) for i in range(args.number_of_wards)]
     ward_df["capacity_num"] = ward_df["p1_cap"] = ward_df["p2_cap"] = ward_df[
         "p3_cap"] = ward_df["nurse_associate_cap"] = np.random.randint(2, 30, size=(args.number_of_wards))
-    ward_df["need_to_drive"] = random.choices([True, False], weights=[0.75, 0.25], k=args.number_of_students)
-    ward_df["DYAD"] = random.choices([True, False], weights=[0.75, 0.25], k=args.number_of_students)
+    ward_df["need_to_drive"] = random.choices([True, False], weights=[0.75, 0.25], k=args.number_of_wards)
+    ward_df["DYAD"] = random.choices([True, False], weights=[0.75, 0.25], k=args.number_of_wards)
 
     placement_df["placement_len_weeks"] = np.random.randint(1, 5,
                                                 size=(args.number_of_students * 3))
