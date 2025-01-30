@@ -109,14 +109,14 @@ class FakeData():
     student_df["student_id"] = [random.randint(10000, 99999) for i in range(args.number_of_students)]
     student_df["Forename"] = ["Forename " + str(i) for i in range(args.number_of_students)]
     student_df["Surname"] = ["Surname " + str(i) for i in range(args.number_of_students)]
-    student_df["is_driver"] = random.choices([True, False], weights=[0.75, 0.25], k=args.number_of_students)
+    student_df["is_driver"] = random.choices([True, False], weights=[0.2, 0.8], k=args.number_of_students)
     student_df["prev_placements"] = [[] for i in range(args.number_of_students)]
 
     ward_df["ward_name"] = ["Ward" + str(i) for i in range(args.number_of_wards)]
     ward_df["capacity_num"] = ward_df["p1_cap"] = ward_df["p2_cap"] = ward_df[
         "p3_cap"] = ward_df["nurse_associate_cap"] = np.random.randint(2, 30, size=(args.number_of_wards))
-    ward_df["need_to_drive"] = random.choices([True, False], weights=[0.75, 0.25], k=args.number_of_wards)
-    ward_df["DYAD"] = random.choices([True, False], weights=[0.75, 0.25], k=args.number_of_wards)
+    ward_df["need_to_drive"] = random.choices([True, False], weights=[0.05, 0.95], k=args.number_of_wards)
+    ward_df["DYAD"] = random.choices([True, False], weights=[0.07, 0.93], k=args.number_of_wards)
 
     placement_df["placement_len_weeks"] = np.random.randint(1, 5,
                                                 size=(args.number_of_students * 3))

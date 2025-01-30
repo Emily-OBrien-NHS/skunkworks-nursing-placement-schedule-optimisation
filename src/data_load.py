@@ -249,7 +249,7 @@ class DataLoader:
         for index, row in self.student_placements.iterrows():
             row_contents = []
             year_num = row.placement_name.split(":", maxsplit=1)[0]
-            nurse_assoc = 'Nursing Associate' in row.qualification_x
+            nurse_assoc = 'Nursing Associate' in row.qualification_x.title()
             row_contents.extend(
                 [
                     index,

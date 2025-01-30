@@ -6,11 +6,13 @@
         ],
         "qualification": [
             "Qualification1",
-            "Qualification2"
+            "Qualification2",
+            "Nursing Associate"
         ],
         "course_start": [
             "CourseStartDate1",
-            "CourseStartDate2"
+            "CourseStartDate2",
+            "CourseStartDate3"
         ],
         "year": [
             "Year 1",
@@ -18,8 +20,7 @@
             "Year 3"
         ],
         "allowable_covid_status": [
-            "CovidStatus1",
-            "CovidStatus2"
+            "CovidStatus1"
         ]
     },
     "ward_data_fields": {
@@ -29,8 +30,7 @@
             "Speciality3"
         ],
         "covid_status": [
-            "CovidStatus1",
-            "CovidStatus2"
+            "CovidStatus1"
         ],
         "education_audit_exp": [
             "2121-03-01",
@@ -44,7 +44,8 @@
         ],
         "qualification": [
             "Qualification1",
-            "Qualification2"
+            "Qualification2",
+            "Nursing Associate"
         ],
         "course_start": [
             "CourseStartDate1",
@@ -57,13 +58,7 @@
         ],
         "placement_start_date": [
             "2121-05-01",
-            "2121-06-07",
-            "2121-07-14",
-            "2121-08-21",
-            "2121-09-28",
-            "2121-10-03",
-            "2121-11-10",
-            "2121-12-17"
+            "2121-06-07"
         ]
     }
 }
