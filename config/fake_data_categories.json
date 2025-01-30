@@ -38,19 +38,6 @@
         ]
     },
     "placement_data_fields": {
-        "university": [
-            "University1",
-            "University2"
-        ],
-        "qualification": [
-            "Qualification1",
-            "Qualification2",
-            "Nursing Associate"
-        ],
-        "course_start": [
-            "CourseStartDate1",
-            "CourseStartDate2"
-        ],
         "placement_name": [
             "Year 1: Placement1",
             "Year 2: Placement1",

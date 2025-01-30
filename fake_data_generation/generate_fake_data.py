@@ -98,11 +98,13 @@ class FakeData():
                 data_cat["ward_data_fields"][column], size=args.number_of_wards
             )
 
+    cohort_cols = ['university', 'qualification', 'course_start']
+    student_courses = student_df[cohort_cols].drop_duplicates()
+    placement_df[cohort_cols] = student_courses
     for column in placement_columns:
         if column in data_cat["placement_data_fields"].keys():
             placement_df[column] = np.random.choice(
-                data_cat["placement_data_fields"][column], size=args.number_of_students * 3
-            )
+                data_cat["placement_data_fields"][column], size=len(student_courses))
 
     # Remaining fields to fill in so they are not null
     # fields requiring int:
