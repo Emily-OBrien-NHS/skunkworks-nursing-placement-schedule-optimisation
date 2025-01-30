@@ -1153,7 +1153,11 @@ class Schedule:
         ###UHPT Output
         schedule['placement'] = [i[1].strip() for i in
                                      schedule['placement_name'].str.split(':')]
-        UHPT_schedule = (schedule.groupby(['nurse_uni_cohort', 'placement_part',
+        UHPT_schedule = (schedule[['nurse_uni_cohort', 'placement_part',
+                                        'nurse_id', 'nurse_name', 'is_driver?',
+                                        'ward_history', 'placement', 'ward_name']]
+                        .drop_duplicates()
+                        .groupby(['nurse_uni_cohort', 'placement_part',
                                         'nurse_id', 'nurse_name', 'is_driver?',
                                         'ward_history', 'placement'],
                                         as_index=False)['ward_name']

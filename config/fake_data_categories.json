@@ -13,8 +13,9 @@
             "CourseStartDate2"
         ],
         "year": [
-            "YearA",
-            "YearB"
+            "Year 1",
+            "Year 2",
+            "Year 3"
         ],
         "allowable_covid_status": [
             "CovidStatus1",
@@ -50,8 +51,9 @@
             "CourseStartDate2"
         ],
         "placement_name": [
-            "YearA: Placement1",
-            "YearB: Placement1"
+            "Year 1: Placement1",
+            "Year 2: Placement1",
+            "Year 3: Placement1"
         ],
         "placement_start_date": [
             "2121-05-01",
