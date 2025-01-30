@@ -1,11 +1,14 @@
 {
     "student_data_fields": [
         "student_id",
+        "Forename",
+        "Surname",
         "university",
         "qualification",
         "course_start",
         "year",
         "prev_placements",
+        "is_driver",
         "allowable_covid_status"
     ],
     "ward_data_fields": [
@@ -16,7 +19,10 @@
         "capacity_num",
         "p1_cap",
         "p2_cap",
-        "p3_cap"
+        "p3_cap",
+        "nurse_associate_cap",
+        "need_to_drive",
+        "DYAD"
     ],
     "placement_data_fields": [
         "university",

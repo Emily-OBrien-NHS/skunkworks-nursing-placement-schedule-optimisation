@@ -13,6 +13,7 @@ from src.create_inputs import StudentTab
 from src.data_load import DataLoader
 from src.GeneticAlgorithm import GeneticAlgorithm
 from src.Schedule import Schedule
+from fake_data_generation.generate_fake_data import FakeData
 import yaml
 from datetime import datetime
 import os
@@ -171,7 +172,8 @@ if page == "Run algorithm":
     #If fake data read in that
     if file_source == "Fake data":
         try:
-            dataload.readData("data/fake_data.xlsx")
+            fake_data = FakeData
+            dataload.readData(fake_data.fake_data_file)
         except FileNotFoundError:
             logging.exception(f"No fake_data.xlsx file found in the data directory")
     #else use the file upload
