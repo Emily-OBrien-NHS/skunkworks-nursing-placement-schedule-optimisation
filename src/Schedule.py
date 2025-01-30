@@ -1154,28 +1154,13 @@ class Schedule:
         schedule['placement'] = [i[1].strip() for i in
                                      schedule['placement_name'].str.split(':')]
         UHPT_schedule = (schedule[['nurse_uni_cohort', 'placement_part',
-                                        'nurse_id', 'nurse_name', 'is_driver?',
-                                        'ward_history', 'placement', 'ward_name']]
-                        .drop_duplicates()
-                        .groupby(['nurse_uni_cohort', 'placement_part',
-                                        'nurse_id', 'nurse_name', 'is_driver?',
-                                        'ward_history', 'placement'],
-                                        as_index=False)['ward_name']
-                                        .apply(','.join).reset_index()
-                                        .pivot(index=['nurse_uni_cohort',
-                                               'placement_part', 'nurse_id',
-                                               'nurse_name', 'is_driver?',
-                                               'ward_history'], columns='placement',
-                                               values='ward_name')).reset_index()
-        
-    #    UHPT_schedule = (schedule[['nurse_uni_cohort', 'placement_part',
-     #                              'nurse_id', 'nurse_name', 'is_driver?',
-      #                             'ward_history', 'placement', 'ward_name']]
-       #                            .drop_duplicates()
-        #                    .pivot(index=['nurse_uni_cohort', 'placement_part',
-         #                                 'nurse_id', 'nurse_name', 'is_driver?',
-          #                                'ward_history'], columns='placement',
-           #                               values='ward_name')).reset_index()
+                                   'nurse_id', 'nurse_name', 'is_driver?',
+                                   'ward_history', 'placement', 'ward_name']]
+                                   .drop_duplicates()
+                            .pivot(index=['nurse_uni_cohort', 'placement_part',
+                                          'nurse_id', 'nurse_name', 'is_driver?',
+                                          'ward_history'], columns='placement',
+                                          values='ward_name')).reset_index()
         #Append the file and file name to the list of files
         self.files.append((self.uhpt_schedule_output_to_excel(UHPT_schedule),
                            f"UHPT_schedule_output_{now}_{self.generation}_{self.viable}.xlsx"))
