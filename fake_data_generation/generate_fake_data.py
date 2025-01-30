@@ -121,7 +121,7 @@ class FakeData():
     ward_df["DYAD"] = random.choices([True, False], weights=[0.07, 0.93], k=args.number_of_wards)
 
     placement_df["placement_len_weeks"] = np.random.randint(1, 5,
-                                                size=(args.number_of_students * 3))
+                                                size=len(student_courses))
 
     # Write dataframe to excel
     def fake_data_excel_file(student_df, ward_df, placement_df):
