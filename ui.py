@@ -9,6 +9,7 @@ logging.basicConfig(
 import streamlit as st
 import pandas as pd
 import numpy as np
+from src.create_inputs import InputTemplate
 from src.create_inputs import StudentTab
 from src.data_load import DataLoader
 from src.GeneticAlgorithm import GeneticAlgorithm
@@ -153,6 +154,7 @@ st.title("Nursing Placement Optimisation")
 
 link = "https://github.com/nhsx/skunkworks-nursing-placement-schedule-optimisation"
 st.markdown("This nuse placement tool is adapted from the NHS AI (Artificial Intelligence) Lab Skunkworks team's original scheduler for use at UHPT.  The original code repo can be [found here](%s)"%link)
+st.markdown(Schedule.create_download_link(InputTemplate.create_input_template(), "Input Template"))
 
 #Select box for algorithm/documentaion
 page = st.selectbox("Choose your page", ["Run algorithm", "Create student input sheet", "Usage Instructions", "Documentation"])

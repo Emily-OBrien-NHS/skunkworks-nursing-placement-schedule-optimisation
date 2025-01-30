@@ -2,8 +2,35 @@ import pandas as pd
 import numpy as np
 import datetime
 import base64
+import json
 import io
 
+class InputTemplate:
+    def create_input_template(self):
+
+                # Load fake_data_description.json to get columns required for training data
+        with open("config/input_data_dictionary.json", "r") as file:
+            data_columns = json.load(file)
+
+        # Create dataframe with original data fields
+        student_columns = [x["name"] for x in data_columns["students"]["fields"]]
+        student_df = pd.DataFrame(columns=student_columns)
+        # Create dataframe with original data fields
+        ward_columns = [x["name"] for x in data_columns["wards"]["fields"]]
+        ward_df = pd.DataFrame(columns=ward_columns)
+        # Create dataframe with original data fields
+        placement_columns = [x["name"] for x in data_columns["placements"]["fields"]]
+        placement_df = pd.DataFrame(columns=placement_columns)
+
+        output = io.BytesIO()
+        writer = pd.ExcelWriter(output, engine='xlsxwriter')
+        student_df.to_excel(writer, sheet_name="students", index=False)
+        ward_df.to_excel(writer, sheet_name="wards", index=False)
+        placement_df.to_excel(writer, sheet_name="placements", index=False)
+        writer.close()
+        input_data = output.getvalue()
+        return input_data
+    
 class StudentTab:
     def student_output_to_excel(self, df):
         """
