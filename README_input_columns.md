@@ -102,7 +102,7 @@ A flag of if a ward is remote and would therefore only be able to take students 
 Example: True or False
 
 #### DYAD
-A flag if the ward does DYAD () and therefore could take a higher capacity of students, providing there is a roughly even distribution across all year groups.
+A flag if the ward does DYAD and therefore could take a higher capacity of students, providing there is a roughly even distribution across all year groups.
 
 Example: True or False
 
