@@ -1,8 +1,6 @@
 import pandas as pd
 import numpy as np
 import datetime
-import base64
-import json
 import io
 
 class InputTemplate:
@@ -59,22 +57,27 @@ class StudentTab:
                                             'MJN':'Plymouth Marjon University'})
         qualification = cohort_split.str[1:].str.join(' ').str.strip()
         year = ('Year ' + (datetime.datetime.now().year
-                        - ('20' + course_start.str.findall(r'\d+').str[0]).astype(int) + 1).clip(upper=3).astype(str))
+                        - ('20' + course_start.str.findall(r'\d+').str[0]
+                           ).astype(int) + 1).clip(upper=3).astype(str))
         past_placements = (df[[col for col in df.columns
                             if ('placement' in col.lower())
                             or ('unnamed' in col.lower())]]
                             .replace('X', np.nan).values.tolist())
         past_placements = [[e for e in row if e==e] for row in past_placements]
-        is_driver = df['Driver'].str.lower().fillna('no').map({'no':False, 'yes':True}).astype(bool)
+        is_driver = (df['Driver'].str.lower().fillna('no')
+                     .map({'no':False, 'yes':True}).astype(bool))
 
         students_tab = pd.DataFrame({'student_id':df['Uni Number'],
                                     'Forename':df['Forename'],
                                     'Surname':df['Surname'],
                                     'university':university,
                                     'qualification':qualification,
-                                    'course_start':course_start.str.replace('S', 'Sep-').str.replace('J','Jan-'),
+                                    'course_start':(course_start
+                                                    .str.replace('S', 'Sep-')
+                                                    .str.replace('J','Jan-')),
                                     'year': year,
                                     'prev_placements':past_placements,
                                     'is_driver':is_driver,
-                                    'allowable_covid_status':['Low/Medium']*len(df)})
+                                    'allowable_covid_status':(['Low/Medium']
+                                                              *len(df))})
         return self.student_output_to_excel(students_tab)

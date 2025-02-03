@@ -8,8 +8,6 @@ import streamlit as st
 import yaml
 from random import randrange
 from typing import Tuple
-import logging
-
 
 class GeneticAlgorithm:
     """
@@ -107,9 +105,6 @@ class GeneticAlgorithm:
                 schedule["schedule"].viable
             ):
                 schedule["schedule"].save_report()
-                logging.info(
-                    f'Viable schedule identified with fitness of {schedule["schedule"].fitness}, saving'
-                )
                 continue_eval = False
                 return continue_eval, schedule["schedule"], schedule_fitnesses
         if continue_eval:
@@ -125,9 +120,6 @@ class GeneticAlgorithm:
         if self.last_fitness < self.schedules[total_schedules - 1]["fitness"]:
             now = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
             self.last_fitness = self.schedules[total_schedules - 1]["fitness"]
-            logging.info(
-                f'At {now} the best fitness in generation is schedule {self.schedules[total_schedules - 1]["sched_id"]} with: {self.last_fitness}'
-            )
             self.no_change_count = 0
         self.iteration_count += 1
         return self.iteration_count
@@ -140,18 +132,12 @@ class GeneticAlgorithm:
         """
         total_schedules = len(self.schedules)
         continue_eval = True
-        logging.info(
-            f'No change detected: {self.last_fitness == self.schedules[total_schedules - 1]["fitness"]}, no change number {self.no_change_count}'
-        )
         if self.last_fitness == self.schedules[total_schedules - 1]["fitness"]:
             self.no_change_count += 1
             if self.no_change_count >= self.max_no_change_iterations:
                 self.schedules[total_schedules - 1]["schedule"].populate_schedule()
                 self.schedules[total_schedules - 1]["schedule"].save_report()
                 self.schedules[total_schedules - 1]["schedule"].get_fitness()
-                logging.info(
-                    f"The algorithm has passed more then {self.max_no_change_iterations} without an improvement in fitness, program terminating"
-                )
                 continue_eval = False
                 return continue_eval, self.schedules[total_schedules - 1]["schedule"]
 

@@ -1,8 +1,9 @@
-# NHS AI Lab Skunkworks project: Nursing Placement Optimisation
+# UHPT: Nursing Placement Optimisation
+
+This repo is forked and adapted from the NHS AI Lab Skunkworks team's Nursing Placement tool, which was:
 
 > A pilot project for the NHS AI (Artificial Intelligence)  Lab Skunkworks team, Nursing Placement Optimisation uses nursing student data from North West London Clinical Commissioning Group, with the pilot carried out for Imperial College Healthcare Trust, to generate placement schedules which meet a range of criteria.
-
-This project is an example of the AI Skunkworks team offering capability resources to produce proof-of-concepts which could be applicable to the NHS at large. The project ran from January 2022 to May 2022.
+> This project is an example of the AI Skunkworks team offering capability resources to produce proof-of-concepts which could be applicable to the NHS at large. The project ran from January 2022 to May 2022.
 
 ![UI Overview](docs/ui_overview.png)
 
@@ -29,7 +30,7 @@ Special thanks to Imperial College Healthcare NHS Trust who were pivotal in prov
 
 The tool is presented as a web-based app, running in your web browser. The tool requires data to be in a specific format (see [Data Dictionary](config/input_data_dictionary.json)). When run, the tool ingests the data saved in the 'data' folder and converts it to the required format. With the data prepared, the tool runs the genetic algorithm which is implemented within it, and returns a number of schedules pre-specified by the user. The schedules are accompanied by a scoring document which score various aspects of each schedule for comparison against one another (for additional details, see the [UI documentation](docs/UI.md)). 
 
-The schedules themselves consist of a number of tabs which enable views from the perspective of both the student and the ward, as well as reporting-based schedules which show hours and utilisation rate for each working week that the schedule covers. The schedules that are produced are different solutions or options to the same problem for the same set of students. In other words, they are different versions of the same schedule.
+The full output from the algorithm consists of a number of tabs which enable views from the perspective of both the student and the ward, as well as reporting-based schedules which show hours and utilisation rate for each working week that the schedule covers. There is also a UHPT specific version which provides a simpler output of some student information and their placement.  The schedules that are produced are different solutions or options to the same problem for the same set of students. In other words, they are different versions of the same schedule.
 
 By producing a variety of schedules which are each strong in slightly different areas, the tool provides placement coordinators with a strong baseline on which the coordinator can impart their knowledge to get the best learning outcomes for the students, and the best allocation of students for the trust.
 
@@ -63,8 +64,6 @@ Cohort hours tracker:
 Ward-centric weekly utilisation tracker:
 ![Ward weekly utilisation schedule](docs/ward_weekly_utilisation.png)
 
-In addition, a log file will be generated for each run in the `log` folder named `nurse_opt_logging.log`. This will contain more granular information about the progress of the generation of each schedule, as well as any information if a schedule is found to be non-viable. Please note that this log file will wipe itself after each run of the tool to prevent very large log files from being created.
-
 ### Schedule constraints
 The tool implements a number of rules, which if breached, render the schedule 'non-usable'. The tool might return non-usable schedules, depending on how the user-defined elements of rules are defined.
 
@@ -84,49 +83,33 @@ Alongside constraints, the tool has a number of goals that it tries to get the b
 | [Constraints](docs/constraints.md) | Full list of the constraints applied to this problem |
 
 ## Getting Started
-This project requires Python 3.8.5+
 
-Please note this tool was created and tested using MacOS Monterey 12.4 on an Intel chip.
-
-1. Create your virtual environment using e.g. [venv](https://docs.python.org/3/library/venv.html) `python -m venv venv`
-2. Activate your virtual environment using either `venv\scripts\activate` on Windows or `source venv/bin/activate` on MacOS
-3. Install the required dependencies within the virtual environment using the requirements.txt e.g. `pip install -r requirements.txt`
-4. Generate fake data using the built in Fake Data Generator (instructions [below](#using-fake-data))
-5. The Streamlit interface is launched by calling `streamlit run ui.py`
-6. Your results will be saved in the `results/` folder
+This app is deployed on streamlit and can be accessed via [this link](https://uhpt-nurse-scheduler.streamlit.app/)
 
 ### Using fake data
 
-This repository includes a [fake data generator](fake_data_generation/) which generates a file of the required structure, allowing a test run of the tool to be done.
-
-To run the test run using fake data, first generate the fake data by running:
-`python fake_data_generation/generate_fake_data.py`
-
-This will save a file called `fake_data.xlsx` to the `data/` directory.
-
-Once that is done, you can launch the tool by running `streamlit run ui.py` and selecting `Fake data` from the `Select your data source` drop down.
+In the UI there is a fake data option in the "Select your data source", which generates a file of the required structure, allowing a test run of the tool to be done.  (This will also provide a download link for the generated fake data if you would like it).
 
 ### Using your own data
 
-If you'd like to use your own data, the fake data generated shows the required structure. The main requirements are:
+If you'd like to use your own data, download the "Download Input Template". The main requirements are:
 - A tab called 'students' containing the fields described under 'students' [here](config/input_data_dictionary.json)
 - A tab called 'wards' containing the fields described under 'wards' [here](config/input_data_dictionary.json)
 - A tab called 'placements' containing the fields described under 'placements' [here](config/input_data_dictionary.json)
+There is a less technical description of how to fill in this input file in the "Input File Details" pop-over in the UI.
 
 Additional example data can be viewed by generating the fake data as above.
 
-Your input data file will need to be stored in `data/` and its name added to `config/params.yml` in the `input_file_name` variable within `ui_params`.
-
-If further support is needed, please get in touch with us for support: england.aiskunkworks@nhs.net
-
 
 ## NHS AI Lab Skunkworks
-The project is carried out by the NHS AI Lab Skunkworks, which exists within the NHS AI Lab to support the health and care community to rapidly progress ideas from the conceptual stage to a proof of concept.
+The project was adapted from the work carried out by the NHS AI Lab Skunkworks, which exists within the NHS AI Lab to support the health and care community to rapidly progress ideas from the conceptual stage to a proof of concept.
 
 Find out more about the [NHS AI Lab Skunkworks](https://www.nhsx.nhs.uk/ai-lab/ai-lab-programmes/skunkworks/).
 
 Join our [Virtual Hub](https://future.nhs.uk/connect.ti/system/text/register) to hear more about future problem-sourcing event opportunities.
 Get in touch with the Skunkworks team at england.aiskunkworks@nhs.net.
+
+For any issues with this UHPT version of the scheduler, please contact Emily O'Brien at e.obrien6@nhs.net
 
 ## Acknowledgements
 This tool is developed, in part, based on [GASchedule.py](https://github.com/mcychan/GASchedule.py) which was used as a starting point for this project

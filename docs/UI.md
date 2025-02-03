@@ -6,16 +6,42 @@ This document provides an overview of the User Interface (UI) and the meaning of
 When the UI first loads, several components will be visible initially:
 | Component | Purpose |
 | --------- | ------- |
-| "Choose your page" dropdown | this dropdown menu allows the user to switch between "Run algorithm" and "Documentation". This allows the user to view basic documentation within the browser, helping them to get started |
-| "Start date" date selector | this allows the user to choose the earliest date for which placements should be allocated |
-| "End date" date selector | this allows the user to choose the latest date for which placements should be allocated |
-| "Choose number of schedules to generate" slider | this allows the user to choose the number of times that the algorithm will run, and subsequently how many options will be offered to them at the end |
+| Information on the scheduler | Some information and links to the code repos. |
+| "Download Input Template" link | Allows user to download a blank excel input template. |
+| Contact details | Contact details for any questions/errors. |
+| "Usage Instructions" pop-over | A button to bring up the usage instructions. |
+| "Input File Details" pop-over | A button to bring up detailed information on what data should be filled into the input file. |
+| "Choose your page" dropdown | This dropdown menu allows the user to switch between "Run algorithm", "Create Student Input Sheet" and "Documentation". This allows the user to view more detailed documentation/instructions than in the pop-overs. |
 
-Below these components may be:
-- A red error box containing the following text "Be aware that the following wards have Education Audits which expire on or before the start date of your schedules:" followed by a list of wards. This comprises a list of wards where the Education Audit expiry date is on or before the Start Date selected with the End Date date selector.
-- An amber box containing the following text "Additionally, be aware that the following wards have Education Audits which expire on or before the end date of your schedules:" followed by a list of wards. This comprises a list of wards where the Education Audit expiry date is after the Start Date but on or before the End Date selected with the End Date date selector.
+Note: If you upload a file into either the "Run Algorithm" or "Create Student Input Sheet" pages, and then switch to the other, the file will remain and a red error message will appear prompting you to change the input file.
 
-Whether or not these boxes appear will depend on the Education Audit Status of your wards. Note that the Education Audit Expiry date warnings **DO NOT** prevent students from going on placement at that ward. When each final schedule is produced, a list of wards with expired Education Audits will be generated as part of the schedule, to demonstrate the wards which must have an Education Audit completed before placements can be accepted.
+### Create Student Input Sheet
+The UI has the below component when the Create Student Input Sheet page is selected:
+| Component | Purpose |
+| --------- | ------- |
+| "File Upload | User can drag and drop or browse their files to upload the correct input document |
+
+This page allows the user to upload the student information provided by the universities (provided it corresponds to the correct format (MORE INFO TO BE ADDED!!!!!!!!!!)).  This will run some code to transform this into the correct input required by the algorithm and provides a download link, so you can copy and paste into the students sheet on your algorithm input file.
+
+### Run Algorithm
+The UI has the below components when the Run Algorithm page is selected:
+| Component | Purpose |
+| --------- | ------- |
+| "Select your data source" dropdown | Allows the user to choose between uploading their own data, or running with the fake data.  If fake data is chosen, a download link will appear below this, otherwise the below "File Upload" will appear. |
+| "File Upload | User can drag and drop or browse their files to upload the correct input document |
+| "Start date" date selector | Appears once correct file has been uploaded. This allows the user to choose the earliest date for which placements should be allocated. This should auto-populate with the correct date. |
+| "End date" date selector | Appears once correct file has been uploaded. This allows the user to choose the latest date for which placements should be allocated. This should auto-populate with the correct date.  |
+| "Choose number of schedules to generate" slider | Appears once correct file has been uploaded. this allows the user to choose the number of times that the algorithm will run, and subsequently how many options will be offered to them at the end. |
+
+Below these components may be several warnings/errors to flag to the user some issues in the input file:
+- A table of the Student and Capacity counts will appear, with red error messages below if there are more students than capacity will allow.
+- All the mismatched courses (if exists):
+    - An initial red error box detailing how mant students are on courses with no match in the placements tab
+    - A yellow error box listing all the names of the students on the course shown in the table below this, which doesn't match to the placements tab (repeated for all the courses/students that don't match)
+    - A red error box and a table below detailing the courses in the placements tab which don't have any students assigned to them.  This may be that there is a typo of one of the above courses that students are on, but don't match.  If this is not the case, consider deleting this course from the input file for neatness (the algorithm will still run if additional courses are included, they will just be ignored).
+- A red error box and yellow warning box detailing the wards whose education audits have expired, or will expire during the placement period. 
+
+Whether or not these boxes appear will depend on if there are any mismatches in the input files and the Education Audit Status of your wards. Blue boxes will appear if there are no issues in each section. Note that the Education Audit Expiry date warnings **DO NOT** prevent students from going on placement at that ward. When each final schedule is produced, a list of wards with expired Education Audits will be generated as part of the detailed schedule, to demonstrate the wards which must have an Education Audit completed before placements can be accepted.
 
 Finally, below this will be the "Click here to start running" button. When pressed, this will begin running the algorithm with the settings configured using the components above.
 
@@ -27,10 +53,10 @@ While the tool is running, some live information will be displayed to help you k
 | Current schedule version being generated | this shows the progress of the algorithm and will count up as it tries to produce the best possible schedule |
 | Highest schedule fitness score | this is the current highest score of the schedules which have been generated. This score should increase while the tool runs, but may reach a point where it can no longer improve the best schedule. |
 
-With each schedule that is finished, a table will be displayed summarising some key information about each schedule. This information includes:
+With each schedule that is finished, a table will be displayed summarising some key information about each schedule (you may need to scroll across this table to view all the information). This information includes:
 | Field | Explanation |
 | ----- | ----------- |
-| Schedule file name | This is the name of the schedule as saved in the `results` folder |
+| Schedule file name | This is the name of the schedule iteration |
 | Viable schedule? | This immediately tells you whether or not the schedule satisfies all of the [constraints](docs/constraints.md) specified |
 | Number of iterations to generate | This tells you how many cycles of the algorithm it took to produce the final schedule |
 | Schedule Fitness Score | This is the fitness score of each schedule produced. These scores are mostly useful to compare schedules to each other |
@@ -55,4 +81,4 @@ If Student B goes on placements at the following wards: 'Ward A', 'Ward G', 'War
 ### After the algorithm has run
 Once the algorithm has finished running, some balloons will appear, as well as a green box stating 'Schedule production complete!'. This indicates that all of the requested schedules have been produced and are ready for human review.
 
-Each schedule will be saved down to the `results` folder, as well as a copy of the table displayed on the UI, so that comparisons can be done after the tool is closed.
+Download links for the comparison file and each individual output (both the detailed version and simplified UHPT version) will appear at the very bottom of the page.

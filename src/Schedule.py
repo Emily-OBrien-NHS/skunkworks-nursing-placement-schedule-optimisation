@@ -10,7 +10,6 @@ import re
 from typing import Tuple
 import yaml
 import os
-import logging
 import random
 import streamlit as st
 import io
@@ -191,56 +190,6 @@ class Schedule:
                 break
             #Randomly pick a valid ward.
             ward_id = random.choice(valid_ward_ids)
-
-            # Find a ward which valid based on capacity and education audit
-            #while invalid_ward:
-                #invalid_ward = False
-                #ward_id = randint(0, len(self.wards) - 1)
-                
-                # slot_index_increment = self.calc_slot_index(
-                #     ward_id, self.num_weeks, p.start
-                # )
-                # #If no capacity for students in that year, then ward is invalid
-                # year_cap = self.id_year_capacity(p, ward_id)
-
-                # #If no capacity for students in that year, then ward is invalid
-                # if year_cap == 0:
-                #     invalid_ward = True
-                # #If course is Nursing Associate, ensure no placements are assigned
-                # #to a ward that cannot accomodate this
-                # elif (p.nurse_assoc
-                #     and self.wards[ward_id].nurse_assoc_capacity == 0):
-                #     print('Ward invalid as nursing assoc')
-                #     invalid_ward = True
-                # #If student is not a driver, ensure no placements are assigned
-                # #to a ward that would require driving.
-                # elif ((not p.is_driver) and (self.wards[ward_id].need_to_drive)):
-                #     print('Ward invalid as student is not driver')
-                #     invalid_ward = True
-                # else:
-                #     for i in range(0, placement_duration):
-                #         # Check if overall capacity breached or ward has expired education audit
-                #         if (
-                #             len(self.slots[slot_index_increment])
-                #             >= self.wards[ward_id].capacity
-                #         ) or (
-                #             (p.covid_status == "Low/Medium")
-                #             and (self.wards[ward_id].covid_status == "Medium/High")
-                #         ):
-                #             invalid_ward = True
-                #             break
-                #         else:
-                #             # If overall cap and education audit are fine, check whether year-specific capacity satisfied
-                #             same_year_count = 0
-                #             for plac in self.slots[slot_index_increment]:
-                #                 if plac.part == p.part:
-                #                     same_year_count += 1
-                #             if same_year_count >= year_cap:
-                #                 invalid_ward = True
-                #                 break
-                #             if invalid_ward:
-                #                 break
-                #         slot_index_increment += 1
        
             # Now that a ward has been identified, populate schedule
             overall_slot_index = self.calc_slot_index(ward_id, self.num_weeks, p.start)
@@ -809,9 +758,6 @@ class Schedule:
             ]
         else:
             incorrect_num_plac_rows = None
-        logging.info(
-            f"{num_incorr_num_plac} students have the incorrect number of placements"
-        )
 
         ## Check that all placements are correct length
         placement_length_check = schedule[
@@ -834,7 +780,6 @@ class Schedule:
             ]
         else:
             incorrect_len_rows = None
-        logging.info(f"{num_incorrect_length} placements are the incorrect length")
 
         ## Check whether year-specificcapacity of any of the wards is exceeded
         year_specific_ward_cap = pd.DataFrame(
@@ -893,15 +838,9 @@ class Schedule:
 
         num_capacity_exceeded = ward_cap[(ward_cap.cap_exceeded)].shape[0]
         if num_capacity_exceeded > 0:
-            logging.info(
-                f"Total ward-weeks where capacity exceeded: {num_capacity_exceeded}"
-            )
             cap_exceeded_rows = ward_cap[(ward_cap.cap_exceeded)]
         else:
             cap_exceeded_rows = None
-            logging.info(
-                f"{num_capacity_exceeded} wards have their placement capacity exceeded"
-            )
 
         # Check whether any of the nurses have duplicate assignments
         ward_assignment = pd.DataFrame(
@@ -910,15 +849,9 @@ class Schedule:
         ward_assignment.reset_index(inplace=True)
         num_double_booked = ward_assignment[ward_assignment.ward_name > 1].shape[0]
         if num_double_booked > 0:
-            logging.info(
-                f"Total blocks where multiple placements assigned: {num_double_booked}"
-            )
             double_booked_rows = ward_assignment[ward_assignment.ward_name > 1]
         else:
             double_booked_rows = None
-            logging.info(
-                f"{num_double_booked} nurses have more than one placement assigned in a certain week"
-            )
 
         self.quality_metrics["num_incorr_num_plac"] = num_incorr_num_plac
         self.quality_metrics["num_incorrect_length"] = num_incorrect_length
@@ -955,10 +888,6 @@ class Schedule:
         :returns: the file name of the saved down report
         """
         schedule = self.produce_dataframe()
-        logging.info(f"Generation: {str(self.generation)}")
-        logging.info(f"Schedule Viable?: {self.viable}")
-        if not self.viable:
-            logging.info(f"Non-viable reason: {self.non_viable_reason}")
 
         schedule["placement_start_week"] = schedule["placement_week"]
         schedule["nurse_id"] = None
@@ -1171,7 +1100,7 @@ class Schedule:
         """Function to create a download link for the generated file.  Doing
         it this way stops streamlit from refreshing the whole page.
         Returns:
-            : file download link
+        string : file download link
         """
         b64 = base64.b64encode(val)
         return f'<a href="data:application/octet-stream;base64,{b64.decode()}" download="{filename}">Download {filename}</a>'

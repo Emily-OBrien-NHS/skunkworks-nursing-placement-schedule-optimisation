@@ -31,7 +31,7 @@ The name of the qualification the student is studying for. (Note: This must **ex
 Example: Nur Adult BSC
 
 #### course_start
-The date the student began studying on this course (Note: This must *exactly match* the same value in the course_start column in the placements sheet, and must match across all students on that course with that start date)
+The date the student began studying on this course (Note: This must **exactly match** the same value in the course_start column in the placements sheet, and must match across all students on that course with that start date)
 
 Example: Sep-24
 
@@ -41,7 +41,7 @@ The year of study the student is currently.
 Example: Year 1
 
 #### prev_placements
-A list of all the previous placements a student has done.  (Note: These must *exactly match* the same value in the ward_name column on the ward sheet, or the student could be placed on the same ward again.  For any wards in these lists that UHPT don't allocate to, you can add them to the wards sheet with 0 for the capacity columns, so the algorithm will know which specialties the students have been under previously and try not to repeat them. (education_audit_exp column can be left blank, put 'Low/Medium'  for covid_status, and False for the remaining columns))
+A list of all the previous placements a student has done.  (Note: These must **exactly match** the same value in the ward_name column on the ward sheet, or the student could be placed on the same ward again.  For any wards in these lists that UHPT don't allocate to, you can add them to the wards sheet with 0 for the capacity columns, so the algorithm will know which specialties the students have been under previously and try not to repeat them. (education_audit_exp column can be left blank, put 'Low/Medium'  for covid_status, and False for the remaining columns))
 
 Example: [] if no previous placements, or ['Ward1', 'ward2', 'ward3']
 
@@ -60,7 +60,7 @@ Example: Low/Medium
 A sheet containing all the wards you can place students onto (and other wards the student may have been to previously, to capture their specialty).
 
 #### ward_name
-The name of the ward (Note: These must *exactly match* the same values in the previous_placemtns column on the students sheet, or the student could be placed on the same ward again.  For any wards in the student placement lists that UHPT don't allocate to, you can add them to the wards sheet with 0 for the capacity columns, so the algorithm will know which specialties the students have been under previously and try not to repeat them. (education_audit_exp column can be left blank, put 'Low/Medium'  for covid_status, and False for the remaining columns))
+The name of the ward (Note: These must **exactly match** the same values in the previous_placemtns column on the students sheet, or the student could be placed on the same ward again.  For any wards in the student placement lists that UHPT don't allocate to, you can add them to the wards sheet with 0 for the capacity columns, so the algorithm will know which specialties the students have been under previously and try not to repeat them. (education_audit_exp column can be left blank, put 'Low/Medium'  for covid_status, and False for the remaining columns))
 
 Example:  Ward 1
 
@@ -122,7 +122,7 @@ The name of the qualification for this placement. (Note: This must **exactly mat
 Example: Nur Adult BSC
 
 #### course_start
-The date the course began (Note: This must *exactly match* the same value in the course_start column in the students sheet, and must match across all students on that course with that start date)
+The date the course began (Note: This must **exactly match** the same value in the course_start column in the students sheet, and must match across all students on that course with that start date)
 
 Example: Sep-24
 

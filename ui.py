@@ -1,36 +1,32 @@
-import logging
-
-for handler in logging.root.handlers[:]:
-    logging.root.removeHandler(handler)
-logging.basicConfig(
-    filename="log/nurse_opt_logging.log", filemode="w", level=logging.INFO
-)
-
 import streamlit as st
 import pandas as pd
 import numpy as np
+from datetime import datetime
+import matplotlib.pyplot as plt
+import yaml
+import os
 from src.create_inputs import InputTemplate
 from src.create_inputs import StudentTab
 from src.data_load import DataLoader
 from src.GeneticAlgorithm import GeneticAlgorithm
 from src.Schedule import Schedule
 from fake_data_generation.generate_fake_data import FakeData
-import yaml
-from datetime import datetime
-import os
-import matplotlib.pyplot as plt
-import random
 
+################################################################################
+                        #Main function to run the alg#
+################################################################################
 def main(num_schedules: int, pop_size: int):
     """
     Function to run Nursing Placement Optimisation tool end-to-end
-    :param num_schedules: the overall integer number of schedules to output from the tool. Can be otherwise thought of as number of times the tool is run
-    :param pop_size: the size of the population to be used for each run. This is the integer number of schedules randomly produced for each run of the tool, which are used as the base to find the best performing schedule from
+    :param num_schedules: the overall integer number of schedules to output
+    from the tool. Can be thought of as number of times the tool is run
+    :param pop_size: the size of the population to be used for each run. This
+    is the integer number of schedules randomly produced for each run of the
+    tool, which are used as the base to find the best performing schedule from
     
-    :returns: A series of .xlsx files, stored in results/ which contain the schedules, as well as a comparison file which shows the scores of each schedule beside each other
+    :returns: A series of .xlsx files, which contain the schedules, as well as
+    a comparison file which shows the scores of each schedule beside each other
     """
-
-    st.info("Some useful information which may be of interest will be printed in the Command Line terminal and stored in log/nurse_opt_logging.log")
     st.subheader("Cycle information")
     st.subheader("Last saved schedule details")
     ui_schedule_results = st.empty()
@@ -41,12 +37,12 @@ def main(num_schedules: int, pop_size: int):
                   dataload.student_placements["placement_start_date_raw"].min()))
                 / np.timedelta64(1, "W"), 0))
 
-    #  Add maximum placement length so that schedule is large enough to accommodate even the longest placement
+    # Add maximum placement length so that schedule is large enough to
+    # accommodate even the longest placement
     num_weeks = (num_weeks
                  + int(dataload.student_placements["placement_len_weeks"].max())
                  + 1)
 
-    logging.info(f"Total weeks covered: {num_weeks}")
     slots, wards, placements = dataload.preprocData(num_weeks)
 
     num_iter = num_schedules
@@ -113,8 +109,6 @@ def main(num_schedules: int, pop_size: int):
         scheduleCompareDF["Non-viable reason"] = scheduleCompareDF["Non-viable reason"].fillna("")
         ui_schedule_results.dataframe(scheduleCompareDF.style
                                     .highlight_max(axis=0, color="lightgreen"))
-        logging.info(f"{chosen_schedule.file_name} generated")
-        logging.info(scheduleCompareDF.dtypes)
     script_directory = os.path.dirname(os.path.abspath(__file__))
     save_directory = os.path.join(script_directory, "results")
     try:
@@ -137,37 +131,68 @@ def main(num_schedules: int, pop_size: int):
         download_link = Schedule.create_download_link(file, file_name)
         st.markdown(download_link, unsafe_allow_html=True)
 
-    logging.info("File download links created")
     viableBool = False
-    logging.info(scheduleCompareDF.dtypes)
+
     if scheduleCompareDF["Viable schedule?"].astype(bool).sum() > 0:
         viableBool = True
     return viableBool
+
+################################################################################
+                            #Generic page config#
+################################################################################
 
 #Page config, logo and title
 st.set_page_config(page_title="Placement Optimisation",
                    page_icon="nhs_logo.png",
                    layout="wide",
                    initial_sidebar_state="auto")
-st.image("docs/Uhp.png")
-st.title("Nursing Placement Optimisation")
+col1, col2, col3 = st.columns([0.43,0.43,0.14])
+with col3:
+    st.image("docs/Uhp.png")
+with col1:
+    st.title("Nursing Placement Optimisation")
 
+
+#Add information about the nurse scheduler and contact details if issues
 OG_link = "https://github.com/nhsx/skunkworks-nursing-placement-schedule-optimisation"
 UHPT_link = "https://github.com/Emily-OBrien-NHS/skunkworks-nursing-placement-schedule-optimisation"
-st.markdown("This nuse placement tool is adapted from the NHS AI (Artificial Intelligence) Lab Skunkworks team's original scheduler for use at UHPT.  The original code repo can be [found here](%s)"%OG_link)
-st.markdown("The UHPT adapted code repo for this app can be [found here](%s)"%UHPT_link)
-st.markdown("If you have any issues using this app, please first refer back to the user instructions and/or warning messages.  If you still have issues, please contact Emily O'Brien at e.obrien6@nhs.net")
-with st.popover("Usage Instructions"):
-    f = open("README_usage_instructions.md", "r")
-    st.markdown(f.read())
-with st.popover("Input File Details"):
-    f = open("README_input_columns.md", "r")
-    st.markdown(f.read())
+DOWNLOAD_TEMPLATE_link = Schedule.create_download_link(
+                         InputTemplate.create_input_template(),
+                         "Input Template.xlsx")
+#Add links to the original and UHPT githubs
+st.markdown("This nuse placement tool is adapted from the NHS AI (Artificial "
+            "Intelligence) Lab Skunkworks team's original scheduler for use at "
+            "UHPT.  The original code repo can be [found here](%s). The UHPT "
+            "adapted code repo for this app can be [found here](%s)."
+            %(OG_link, UHPT_link))
+#Add download link for input template.
+st.markdown("You can download a blank excel input template here: %s"
+            %DOWNLOAD_TEMPLATE_link, unsafe_allow_html=True)
+#Add contact details
+st.markdown("If you have any issues using this app, please first refer back to "
+            "the user instructions and/or warning messages.  If you still have "
+            "issues, please contact Emily O'Brien at e.obrien6@nhs.net")
 
-st.markdown(Schedule.create_download_link(InputTemplate.create_input_template(), "Input Template.xlsx"), unsafe_allow_html=True)
-#Select box for algorithm/documentaion
-page = st.selectbox("Choose your page", ["Run algorithm", "Create Student Input Sheet", "Documentation"])
+#Add popovers for usage instructions and input file details.
+#Use multiple columns to have these sat next to each other
+col1, col2, empty = st.columns([0.08, 0.08, 0.84])
+with col1:
+    with st.popover("Usage Instructions"):
+        f = open("README_usage_instructions.md", "r")
+        st.markdown(f.read())
+with col2:
+    with st.popover("Input File Details"):
+        f = open("README_input_columns.md", "r")
+        st.markdown(f.read())
 
+#Select box for which page to view - run algorithm, create student input sheet
+# #or documentaion
+page = st.selectbox("Choose your page",
+            ["Run algorithm", "Create Student Input Sheet", "Documentation"])
+
+################################################################################
+                                #Run algorithm page#
+################################################################################
 if page == "Run algorithm":
     dataload = DataLoader()
     # Open the config params file to get some key arguments
@@ -177,18 +202,24 @@ if page == "Run algorithm":
     # algorithm terminology for the size of the population, or in this case the
     # number of schedules being created to use to find the best solution)
     numberOfChromosomes = params["ui_params"]["numberOfChromosomes"]
+
     #Select wether using own or fake data
     file_source = st.selectbox("Select your data source",
                                ["Your own data", "Fake data"])
-    #If fake data read in that
+    
+    #If fake data, create that data and use it
     if file_source == "Fake data":
+        #create fake data
         fake_data = FakeData
+        #add fake data download link
         st.markdown(fake_data.fake_data_download_link, unsafe_allow_html=True)
+        #use this as the input file
         input_file = fake_data.fake_data_file
     #else use the file upload
     elif file_source == "Your own data":
-        # From the config file, get the name of the file containing the input data
+        #User to upload input file
         input_file = st.file_uploader("Choose a file")
+    #Once file hs been added, check file and run.
     if input_file is not None:
         #check the uploaded file has the correct sheets, to check if completely
         #wrong file is uploaded.
@@ -196,40 +227,59 @@ if page == "Run algorithm":
         if not {"students", "wards", "placements"}.issubset(set(df.keys())):
             st.error("Please upload the correct input file.")
         else:
+            #If another error occurs when trying to read the data, give a
+            # warning to the user to check they've uploaded the correct file.
             try:
                 dataload.readData(input_file)
             except FileNotFoundError:
-                logging.exception(f"Issue with uploaded file {input_file}, is this the correct input file?")
+                st.error(f"Issue with uploaded file {input_file}, "
+                         "is this the correct input file?")
 
             #Get the student start dates
-            student_placement_starts = dataload.student_placements["placement_start_date_raw"]
-            student_placement_ends = dataload.student_placements["placement_start_date_raw"] + pd.to_timedelta(dataload.student_placements["placement_len_weeks"], unit='w')
-            #get start and end date
+            student_placement_starts = min(
+                        dataload.student_placements["placement_start_date_raw"])
+            student_placement_ends = max(
+                dataload.student_placements["placement_start_date_raw"]
+                + pd.to_timedelta(dataload
+                          .student_placements["placement_len_weeks"], unit='w'))
+            
+            #add start and end date inputs
             start_date = st.date_input("Start Date",
-                                        value=pd.to_datetime(min(student_placement_starts),
-                                                                format="%Y-%m-%d"),)
+                                       value=pd.to_datetime(
+                                             student_placement_starts,
+                                             format="%Y-%m-%d"))
             end_date = st.date_input("End Date",
-                                        value=pd.to_datetime(max(student_placement_ends),
-                                                            format="%Y-%m-%d"),)
-            #show error if start date is before end, else filter placements to between
-            #start and end.
+                                     value=pd.to_datetime(
+                                           student_placement_ends,
+                                           format="%Y-%m-%d"))
+            #show error if start date is before end
             if start_date >= end_date:
-                st.error(f"Start date comes after or on the same day as the end date, please correct before proceeding")
-                logging.exception("Start date comes after or on the same day as the end date, please correct before proceeding")
+                st.error(f"Start date comes after or on the same day as the end "
+                         "date, please correct before proceeding")
             else:
-                dataload.student_placements = dataload.student_placements[
-                    (pd.to_datetime(dataload.student_placements.placement_start_date_raw
-                                    ).dt.date >= start_date)
-                    & (pd.to_datetime(dataload.student_placements.placement_start_date_raw
-                                    ).dt.date < end_date)]
+                #else filter placements to between start and end.
+                dataload.student_placements = (dataload.student_placements.loc[
+                    (pd.to_datetime(
+                        dataload.student_placements.placement_start_date_raw
+                        ).dt.date >= start_date)
+                    &
+                    (pd.to_datetime(
+                        dataload.student_placements.placement_start_date_raw
+                        ).dt.date < end_date)])
+
                 #Get user input for number of schedules
                 schedule_num = st.empty()
-                num_schedules = st.slider("Choose number of schedules to generate",
-                                        min_value=1, max_value=10, value=2, step=1,
-                                        help="Note that once you click the Run button below, moving this slider again with cancel the program")
+                num_schedules = st.slider(
+                                "Choose number of schedules to generate",
+                                min_value=1, max_value=10, value=2, step=1,
+                                help="Note that once you click the Run button "
+                                "below, moving this slider again with cancel "
+                                "the program")
                     
-                #Table to flag if more students than placements
+                #Flag if more students than placements
                 st.header("Student and Capacity Counts")
+                #Get the total number of students and the number of students in
+                #each year group.
                 student_counts = dataload.students["year"].value_counts()
                 counts = [student_counts.sum()]
                 for year in ["Year 1", "Year 2", "Year 3"]:
@@ -237,94 +287,151 @@ if page == "Run algorithm":
                         counts.append(student_counts[year])
                     else:
                         counts.append(0)
-                    
+                #Add the number of nursing associates
+                no_nurs_asoc = len(dataload.students.loc[
+                               dataload.students["qualification"].str.title()
+                               .str.contains("Nursing Associate")])
+                counts.append(no_nurs_asoc)
+                #Get a dataframe of the wards overall and year group capacities
                 ward_capacities = pd.DataFrame((dataload.ward_data[
-                                ["capacity","P1_CAP", "P2_CAP", "P3_CAP"]]
+                                ["capacity","P1_CAP", "P2_CAP", "P3_CAP",
+                                 "Nurse_Assoc_CAP"]]
                                 .rename(columns={"capacity":"Total",
-                                                        "P1_CAP":"Year 1",
-                                                        "P2_CAP":"Year 2",
-                                                        "P3_CAP":"Year 3"})).sum())
+                                                 "P1_CAP":"Year 1",
+                                                 "P2_CAP":"Year 2",
+                                                 "P3_CAP":"Year 3",
+                                                 "Nurse_Assoc_CAP"
+                                                  :"Nursing Associate"})).sum())
+                #Add the student counts onto this table and rename columns.
+                #Display table
                 ward_capacities["Student Count"] = counts
                 ward_capacities.columns = ["Ward Capacity", "Student Count"]
                 st.dataframe(ward_capacities)
-                too_many_students = ward_capacities.loc[ward_capacities["Student Count"]
-                                                > ward_capacities["Ward Capacity"]].copy()
+                #Check if there are too many students for capcity and flag to
+                #the user
+                too_many_students = (ward_capacities
+                                     .loc[ward_capacities["Student Count"]
+                                     > ward_capacities["Ward Capacity"]].copy())
                 if len(too_many_students) > 0:
                     for group, row in too_many_students.iterrows():
                         ward_cap = row["Ward Capacity"]
                         no_stud = row["Student Count"]
                         group = group if group != "Total" else "all"
-                        st.error(f"Not enough capacity for {group} students:  there are {no_stud} students and only {ward_cap} placements for {group} students.  Not all students can be placed. Please increase ward capacities or remove additional students.")
+                        st.error(f"Not enough capacity for {group} students:  "
+                                 f"there are {no_stud} students and only "
+                                 f"{ward_cap} placements for {group} students. "
+                                 "Not all students can be placed. Please "
+                                 "increase ward capacities or remove "
+                                 "additional students.")
                 else:
                     st.info("Enough capacity for all students")
 
                 #Flag any mismatched courses
                 st.header("Mismatched Courses")
                 student_cohorts = dataload.students[
-                                    ["university", "qualification", "course_start",
-                                    "student_cohort"]].value_counts().reset_index()
+                                  ["university",
+                                   "qualification",
+                                   "course_start",
+                                   "student_cohort"]
+                                   ].value_counts().reset_index()
                 placement_cohorts = dataload.uni_placements[
-                                        ["university", "qualification", "course_start",
-                                        "student_cohort"]]
-                cohorts = student_cohorts.merge(placement_cohorts, on="student_cohort",
-                                        how="outer", suffixes=["_student", "_placement"])
-                students_no_place = cohorts.loc[cohorts["university_placement"].isna(),
-                                        ["university_student", "qualification_student",
-                                        "course_start_student", "student_cohort",
-                                        "count"]].copy()
+                                    ["university",
+                                     "qualification",
+                                     "course_start",
+                                     "student_cohort"]]
+                cohorts = student_cohorts.merge(placement_cohorts,
+                                            on="student_cohort",
+                                            how="outer",
+                                            suffixes=["_student", "_placement"])
+                students_no_place = cohorts.loc[
+                                    cohorts["university_placement"].isna(),
+                                    ["university_student",
+                                     "qualification_student",
+                                     "course_start_student",
+                                     "student_cohort",
+                                     "count"]].copy()
+                #Flag if there are students with no matching placement
                 if len(students_no_place) > 0:
-                    #If students on a course with no matching placement.
                     no_stud = int(students_no_place["count"].sum())
-                    st.error(f"There are {no_stud} students on courses which don't have a matching placement in the placements tab. Please double check for any typos, spelling errors, extra spaces or add their course to the placements tab, otherwise these students cannot be placed.")
+                    st.error(f"There are {no_stud} students on courses which "
+                             "don't have a matching placement in the "
+                             "placements tab. Please double check for any "
+                             "typos, spelling errors, extra spaces or add "
+                             "their course to the placements tab, otherwise "
+                             "these students cannot be placed.")
                     for idx, row in students_no_place.iterrows():
-                        students = dataload.students.loc[
-                        dataload.students["student_cohort"] == row["student_cohort"],
-                        ["Forename", "Surname"]].agg(" ".join, axis=1)
+                        students = (dataload.students.loc[
+                                    dataload.students["student_cohort"]
+                                    == row["student_cohort"],
+                                    ["Forename", "Surname"]]
+                                    .agg(" ".join, axis=1))
                         student_names = ", ".join(students.tolist())
-                        st.warning(f"The below course is missng from the placemets tab, but has the following students: {student_names}")
+                        st.warning(f"The below course is missng from the "
+                                   "placemets tab, but has the following "
+                                   f"students: {student_names}")
                         st.dataframe(pd.DataFrame(
                                 {"University":row["university_student"],
                                 "Qualification":row["qualification_student"],
-                                "Course Start":row["course_start_student"]}, index=[""]))
+                                "Course Start":row["course_start_student"]},
+                                index=[""]))
                     
-                place_no_stude = cohorts.loc[cohorts["university_student"].isna(),
-                                        ["university_placement", "qualification_placement",
-                                        "course_start_placement"]].copy()
+                place_no_stude = cohorts.loc[
+                                 cohorts["university_student"].isna(),
+                                 ["university_placement",
+                                  "qualification_placement",
+                                  "course_start_placement"]].copy()
+                #Flage if there are any placements with no students (this is 
+                #less of an issue)
                 if len(place_no_stude):
-                    #If there are placements with no students, flag these in case there should be
-                    st.error("The below courses are in the placements tab but have no students. Please double check for any typos, spelling errors or extra spaces if you believe there should be students on these courses:")
+                    #If there are placements with no students, flag these in
+                    # #case there should be
+                    st.error("The below courses are in the placements tab but "
+                             "have no students. Please double check for any "
+                             "typos, spelling errors or extra spaces if you "
+                             "think there should be students on these courses. "
+                             "otherwise the algorithm will ignore them.")
                     st.dataframe(place_no_stude)
 
+                #If all courses match up, alert the user that its ok.
                 if (len(students_no_place) == 0) and (len(place_no_stude) == 0):
-                    st.info("All courses match between the Student and Placment tabs")
+                    st.info("All courses match between the Student and "
+                            "Placment tabs")
 
                 #Show which wards have expired or soon to expire audits
                 st.header("Ward Audit Expiry")
-                expire_wards_string = ""
-                expire_wards = dataload.ward_data.loc[
-                        pd.to_datetime(dataload.ward_data.education_audit_exp).dt.date
-                        <= start_date, "Ward"]
-                for item in list(expire_wards):
-                    expire_wards_string = expire_wards_string + item + ", "
-
-                going_to_expire_wards_string = ""
-                going_to_expire_wards = dataload.ward_data.loc[
-                        (pd.to_datetime(dataload.ward_data.education_audit_exp).dt.date
-                        <= end_date)
-                        & (pd.to_datetime(dataload.ward_data.education_audit_exp).dt.date
-                        > start_date), "Ward"]
-                for item in list(going_to_expire_wards):
-                    going_to_expire_wards_string = going_to_expire_wards_string + item + ", "
-
+                expire_wards = (dataload.ward_data.loc[
+                                pd.to_datetime(
+                                dataload.ward_data.education_audit_exp).dt.date
+                                <= start_date, "Ward"])
+                expire_wards_string = ", ".join(list(expire_wards))
                 if len(expire_wards_string) > 0:
-                    st.error(f"Be aware that the following wards have Education Audits which expire on or before the start date of your schedules:\n {expire_wards_string}")
-                    logging.warning(f"Be aware that the following wards have Education Audits which expire on or before the start date of your schedules: {expire_wards_string}")
+                    st.error(f"Be aware that the following wards have "
+                             "Education Audits which expire on or before the "
+                             "start date of your schedules:\n "
+                             f"{expire_wards_string}")
+
+                going_to_expire_wards = (dataload.ward_data.loc[
+                                        (pd.to_datetime(
+                                        dataload.ward_data.education_audit_exp
+                                        ).dt.date <= end_date)
+                                        &
+                                        (pd.to_datetime(
+                                        dataload.ward_data.education_audit_exp
+                                        ).dt.date > start_date),
+                                        "Ward"])
+                going_to_expire_wards_string = ", ".join(
+                                               list(going_to_expire_wards))
+
                 if len(going_to_expire_wards_string) > 0:
-                    st.warning(f"Additionally, be aware that the following wards have Education Audits which expire on or before the end date of your schedules:\n {going_to_expire_wards_string}")
-                    logging.warning(f"Additionally, be aware that the following wards have Education Audits which expire on or before the end date of your schedules: {going_to_expire_wards_string}")
-                if (len(expire_wards_string) == 0) and (len(going_to_expire_wards_string) == 0):
+                    st.warning(f"Additionally, be aware that the following "
+                               "wards have Education Audits which expire on or "
+                               "before the end date of your schedules:\n "
+                               f"{going_to_expire_wards_string}")
+                if ((len(expire_wards_string) == 0)
+                    and (len(going_to_expire_wards_string) == 0)):
                     st.info("All ward audits are up to date")
 
+                #Run the algorithm with the inputted datal
                 run_button = st.empty()
                 end_message = st.empty()
                 if run_button.button("Click here to start running"):
@@ -333,28 +440,46 @@ if page == "Run algorithm":
                         st.balloons()
                         end_message.success("Schedule production complete!")
                     else:
-                        end_message.error("Schedule production complete, no viable schedules found")
+                        end_message.error("Schedule production complete, no "
+                                          "viable schedules found")
     else:
+        #If no file uploaded, prompt user to upload one.
         st.warning("you need to upload an excel file.")
-        
+
+################################################################################
+                        #Create student input sheet page#
+################################################################################
 elif page == "Create Student Input Sheet":
+    #Upload file
     uploaded_student_file = st.file_uploader("Choose a file")
     if uploaded_student_file is not None:
+        #If a file is uploaded, check if it has the expected columns, if not
+        #alert the user to upload the correct file
         df = pd.read_excel(uploaded_student_file)
-        if  not {"Intake", "Uni Number", "Surname", "Forename", "Driver"}.issubset(set(df.columns)):
+        if  not ({"Intake", "Uni Number", "Surname", "Forename", "Driver"}
+                 .issubset(set(df.columns))):
             st.error("Please upload the correct input file")
         else:
             try:
+                #If correct columns, create the students sheet and provide
+                #download link.
                 create_inputs = StudentTab()
-                student_tab = create_inputs.create_student_tab(uploaded_student_file)
-                download_link = Schedule.create_download_link(student_tab, "Student Tab.xlsx")
+                student_tab = (create_inputs
+                               .create_student_tab(uploaded_student_file))
+                download_link = Schedule.create_download_link(student_tab,
+                                                            "Student Tab.xlsx")
                 st.markdown(download_link, unsafe_allow_html=True)
             except FileNotFoundError:
-                st.error("Some issue in input file. Please ensure it follows the correct format.")
-                logging.exception(f"Some issue in input file {uploaded_student_file}")
+                st.error("Some issue in input file. Please ensure it follows "
+                         "the correct format.")
     else:
+        #Prompt user to upload a file
         st.warning("you need to upload an excel file.")
 
+################################################################################
+                            #Documentation page#
+################################################################################
 elif page == "Documentation":
+    #Display documentation
     f = open("README_ui.md", "r")
     st.markdown(f.read())
