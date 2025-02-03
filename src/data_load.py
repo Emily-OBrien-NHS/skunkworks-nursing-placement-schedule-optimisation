@@ -254,7 +254,7 @@ class DataLoader:
                 [
                     index,
                     row.student_name,
-                    str(row.student_id) + "_" + str(row.placement_name),
+                    str(row.student_id) + "_" + str(row.student_name) + "_" + str(row.placement_name),
                     row.student_cohort,
                     row.placement_len_weeks,
                     row.placement_start_date,

@@ -175,7 +175,7 @@ st.markdown("If you have any issues using this app, please first refer back to "
 
 #Add popovers for usage instructions and input file details.
 #Use multiple columns to have these sat next to each other
-col1, col2, empty = st.columns([0.1, 0.1, 0.8])
+col1, col2, empty = st.columns([0.15, 0.15, 0.7])
 with col1:
     with st.popover("Usage Instructions"):
         f = open("README_usage_instructions.md", "r")
