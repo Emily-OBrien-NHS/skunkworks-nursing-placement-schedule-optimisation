@@ -19,7 +19,7 @@ Note: If you upload a file into either the "Run Algorithm" or "Create Student In
 The UI has the below component when the Create Student Input Sheet page is selected:
 | Component | Purpose |
 | --------- | ------- |
-| "File Upload | User can drag and drop or browse their files to upload the correct input document |
+| "File Upload" | User can drag and drop or browse their files to upload the correct input document |
 
 This page allows the user to upload the student information provided by the universities (provided it corresponds to the correct format (MORE INFO TO BE ADDED!!!!!!!!!!)).  This will run some code to transform this into the correct input required by the algorithm and provides a download link, so you can copy and paste into the students sheet on your algorithm input file.
 
@@ -28,7 +28,7 @@ The UI has the below components when the Run Algorithm page is selected:
 | Component | Purpose |
 | --------- | ------- |
 | "Select your data source" dropdown | Allows the user to choose between uploading their own data, or running with the fake data.  If fake data is chosen, a download link will appear below this, otherwise the below "File Upload" will appear. |
-| "File Upload | User can drag and drop or browse their files to upload the correct input document |
+| "File Upload" | User can drag and drop or browse their files to upload the correct input document |
 | "Start date" date selector | Appears once correct file has been uploaded. This allows the user to choose the earliest date for which placements should be allocated. This should auto-populate with the correct date. |
 | "End date" date selector | Appears once correct file has been uploaded. This allows the user to choose the latest date for which placements should be allocated. This should auto-populate with the correct date.  |
 | "Choose number of schedules to generate" slider | Appears once correct file has been uploaded. this allows the user to choose the number of times that the algorithm will run, and subsequently how many options will be offered to them at the end. |

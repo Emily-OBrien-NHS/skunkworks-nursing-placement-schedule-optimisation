@@ -865,22 +865,7 @@ class Schedule:
             double_booked_rows,
         )
     
-    def uhpt_schedule_output_to_excel(self, df):
-        """
-        Function to create the output UHPT excel file before creating the
-        download link.
-
-        Returns:
-            processed_data : the excel file ready to create the link
-        """
-        output = io.BytesIO()
-        writer = pd.ExcelWriter(output, engine='xlsxwriter')
-        df.to_excel(writer, index=False, sheet_name='Sheet1')
-        writer.close()
-        processed_data = output.getvalue()
-        return processed_data
-    
-    def save_report(self) -> str:
+    def save_report(self, file_no) -> str:
         """
         Function to save down the formatted versions of the schedules including
         a number of views
@@ -1037,9 +1022,22 @@ class Schedule:
         except OSError:
             pass  # already exists
 
-        now = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
-        file_name = f"schedule_output_{now}_{self.generation}_{self.viable}.xlsx"
+        now = datetime.now().strftime("%d-%m-%Y %H-%M")
+        output_file_no = file_no + 1
+        file_name = f"{now} schedule output {output_file_no}-{self.viable}.xlsx"
         self.file_name = file_name
+
+        ###UHPT Output
+        schedule['placement'] = [i[1].strip() for i in
+                                     schedule['placement_name'].str.split(':')]
+        UHPT_schedule = (schedule[['nurse_uni_cohort', 'placement_part',
+                                   'nurse_id', 'nurse_name', 'is_driver?',
+                                   'ward_history', 'placement', 'ward_name']]
+                                   .drop_duplicates()
+                            .pivot(index=['nurse_uni_cohort', 'placement_part',
+                                          'nurse_id', 'nurse_name', 'is_driver?',
+                                          'ward_history'], columns='placement',
+                                          values='ward_name')).reset_index()
         
         #Function to make the excel file needed to create the download link
         #(put within this function for one off use and to save typing out a long
@@ -1047,6 +1045,7 @@ class Schedule:
         def schedule_output_to_excel():
             buffer = io.BytesIO()
             writer = pd.ExcelWriter(buffer, engine='xlsxwriter')
+            UHPT_schedule.to_excel(writer, sheet_name="UHPT_Output", index=False)
             ed_aud_exp_fail.to_excel(writer, sheet_name="wards_expired_audits",
                                      index=False)
             if incorrect_num_plac_rows is not None:
@@ -1077,23 +1076,6 @@ class Schedule:
             return output
         #Append the file and file name to the list of files
         self.files.append((schedule_output_to_excel(), self.file_name))
-
-
-        ###UHPT Output
-        schedule['placement'] = [i[1].strip() for i in
-                                     schedule['placement_name'].str.split(':')]
-        UHPT_schedule = (schedule[['nurse_uni_cohort', 'placement_part',
-                                   'nurse_id', 'nurse_name', 'is_driver?',
-                                   'ward_history', 'placement', 'ward_name']]
-                                   .drop_duplicates()
-                            .pivot(index=['nurse_uni_cohort', 'placement_part',
-                                          'nurse_id', 'nurse_name', 'is_driver?',
-                                          'ward_history'], columns='placement',
-                                          values='ward_name')).reset_index()
-        #Append the file and file name to the list of files
-        self.files.append((self.uhpt_schedule_output_to_excel(UHPT_schedule),
-                           f"UHPT_schedule_output_{now}_{self.generation}_{self.viable}.xlsx"))
-
         return file_name
     
     def create_download_link(val, filename):

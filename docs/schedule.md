@@ -47,9 +47,6 @@ This function simply converts the chromosome structure of the schedule into a mu
 #### schedule_quality_check
 This function does some basic checks to make sure that the constraints applied have not been breached. It contributes to some of the metrics displayed on the UI
 
-#### uhpt_schedule_output_to_excel
-Function to create the UHPT output
-
 #### save_report
 This function takes the Pandas DataFrame produced by `produce_dataframe` and converts it into a range of formatted reports which help the stakeholders with mandatory reporting as well as generally being more useful and readable depending on the circumstance.  There is a function within this to produce the excel file of one of the outputs ready to be downloaded.
 

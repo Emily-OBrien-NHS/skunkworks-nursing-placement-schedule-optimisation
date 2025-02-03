@@ -49,8 +49,8 @@ def main(num_schedules: int, pop_size: int):
     scheduleCompare = []
     placeholder = st.empty()
     graph_placeholder = st.empty()
-    for i in range(num_iter):
-        GA = GeneticAlgorithm(slots, wards, placements, pop_size, num_weeks)
+    for schedule in range(num_iter):
+        GA = GeneticAlgorithm(slots, wards, placements, pop_size, num_weeks, schedule)
         GA.seed_schedules()
         (continue_eval, chosen_schedule, fitness, iteration,
          schedule_fitnesses, download_files) = GA.evaluate()
@@ -58,7 +58,7 @@ def main(num_schedules: int, pop_size: int):
         while continue_eval:
             with placeholder.container():
                 metric1, metric2, metric3 = st.columns(3)
-                metric1.metric("Schedule # being generated", i + 1)
+                metric1.metric("Schedule # being generated", schedule + 1)
                 metric2.metric("Current schedule version generating", iteration)
                 metric3.metric("Highest schedule fitness score", np.round(fitness, 4))
                 with graph_placeholder.container():
@@ -76,7 +76,7 @@ def main(num_schedules: int, pop_size: int):
                     st.info("The above plot shows a histogram of fitness scores for schedules created by the algorithm. A score of 1 is the best possible score, while a score of 0 is the worst possible")
                 (continue_eval, chosen_schedule, fitness, iteration,
                  schedule_fitnesses) = GA.evolve()
-        viable = (chosen_schedule.file_name.split("_", maxsplit=10)[9]
+        viable = (chosen_schedule.file_name.split("-", maxsplit=10)[-1]
                   .replace(".xlsx", ""))
         schedule_scores = chosen_schedule.schedule_eval_scores
         quality_scores = chosen_schedule.quality_metrics
@@ -116,8 +116,8 @@ def main(num_schedules: int, pop_size: int):
     except OSError:
         pass  # already exists
 
-    now = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
-    file_name = f"schedule_comparison_{now}.csv"
+    now = datetime.now().strftime("%d-%m-%Y %H-%M")
+    file_name = f"{now} schedule comparison.csv"
     #Create the comparison dataframe and add it as first in the list of download
     #files
     def convert_to_csv(df):
@@ -175,7 +175,7 @@ st.markdown("If you have any issues using this app, please first refer back to "
 
 #Add popovers for usage instructions and input file details.
 #Use multiple columns to have these sat next to each other
-col1, col2, empty = st.columns([0.08, 0.08, 0.84])
+col1, col2, empty = st.columns([0.1, 0.1, 0.8])
 with col1:
     with st.popover("Usage Instructions"):
         f = open("README_usage_instructions.md", "r")

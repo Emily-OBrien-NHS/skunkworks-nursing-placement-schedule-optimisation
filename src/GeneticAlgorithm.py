@@ -31,12 +31,14 @@ class GeneticAlgorithm:
         placements: list,
         number_of_schedules: int,
         num_weeks: int,
+        schedule_no: int
     ):
         self.slots = slots
         self.wards = wards
         self.placements = placements
         self.number_of_schedules = number_of_schedules
         self.num_weeks = num_weeks
+        self.schedule_no = schedule_no
 
         self.schedules = []
         self.new_schedules = []
@@ -104,7 +106,7 @@ class GeneticAlgorithm:
             if (schedule["schedule"].fitness > self.fitness_threshold) and (
                 schedule["schedule"].viable
             ):
-                schedule["schedule"].save_report()
+                schedule["schedule"].save_report(self.schedule_no)
                 continue_eval = False
                 return continue_eval, schedule["schedule"], schedule_fitnesses
         if continue_eval:
@@ -136,7 +138,7 @@ class GeneticAlgorithm:
             self.no_change_count += 1
             if self.no_change_count >= self.max_no_change_iterations:
                 self.schedules[total_schedules - 1]["schedule"].populate_schedule()
-                self.schedules[total_schedules - 1]["schedule"].save_report()
+                self.schedules[total_schedules - 1]["schedule"].save_report(self.schedule_no)
                 self.schedules[total_schedules - 1]["schedule"].get_fitness()
                 continue_eval = False
                 return continue_eval, self.schedules[total_schedules - 1]["schedule"]
