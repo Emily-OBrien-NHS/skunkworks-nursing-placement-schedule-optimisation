@@ -42,7 +42,7 @@ This function is run once per run of the tool. For the user-specificed number of
 #### viable_schedule_check
 This function is what determines whether a satisfactory schedule has been identified before early stopping criteria are met. It checks whether a schedule meets a score threshold and is viable
 
-#### status update
+#### status_update
 This function provides a command line update as to the current best scoring schedule
 
 #### no_change_check

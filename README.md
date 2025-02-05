@@ -28,7 +28,7 @@ By combining the experience and knowledge of coordinators with the Nursing Place
 Special thanks to Imperial College Healthcare NHS Trust who were pivotal in providing expertise and guidance in order for this tool to be developed.
 ## Placement Optimisation tool
 
-The tool is presented as a web-based app, running in your web browser. The tool requires data to be in a specific format (see [Data Dictionary](config/input_data_dictionary.json)). When run, the tool ingests the data saved in the 'data' folder and converts it to the required format. With the data prepared, the tool runs the genetic algorithm which is implemented within it, and returns a number of schedules pre-specified by the user. The schedules are accompanied by a scoring document which score various aspects of each schedule for comparison against one another (for additional details, see the [UI documentation](docs/UI.md)). 
+The tool is presented as a web-based app, running in your web browser. The tool requires data to be in a specific format (see [Data Dictionary](config/input_data_dictionary.json)). When run, the tool ingests the uploaded data and converts it to the required format. With the data prepared, the tool runs the genetic algorithm which is implemented within it, and returns a number of schedules pre-specified by the user. The schedules are accompanied by a scoring document which score various aspects of each schedule for comparison against one another (for additional details, see the [UI documentation](docs/UI.md)). 
 
 The full output from the algorithm consists of a number of tabs which enable views from the perspective of both the student and the ward, as well as reporting-based schedules which show hours and utilisation rate for each working week that the schedule covers. The first tab is a UHPT specific version which provides a simpler output of some student information and their placement.  The schedules that are produced are different solutions or options to the same problem for the same set of students. In other words, they are different versions of the same schedule.
 
@@ -41,7 +41,7 @@ Within the src code files (`src/`), the classes and functions have been given do
 The tool has demonstrated a robust capability to produce varied sets of placements which meet student needs and allow placement coordinators to have a range of options available on demand. The various reporting views also enable placement coordinators to facilitate changes or updates as required. One example might be that if a student needs a different placement to the one selected by the tool, the ward-centric utilisation tracker allows the placement coordinator to have a single view of each ward's capability to support another placement student.
 
 ### What does the tool produce?
-The output of the tool is a number of schedules (the number selected by the user), which are scored across a number of metrics. The comparison file (named `schedule_comparison_[datetime].csv`) stores these metrics for each schedule, so that the pros and cons of each schedule can be assessed numerically, as well as by eye. 
+The output of the tool is a number of schedules (the number selected by the user), which are scored across a number of metrics. The comparison file (named `[datetime] schedule comparison.csv`) stores these metrics for each schedule, so that the pros and cons of each schedule can be assessed numerically, as well as by eye. 
 
 Each schedule is presented in a variety of views including:
 - A nurse-centric schedule view, enabling each student nurse to see their schedule for the coming weeks
@@ -96,6 +96,7 @@ If you'd like to use your own data, download the "Download Input Template". The 
 - A tab called 'students' containing the fields described under 'students' [here](config/input_data_dictionary.json)
 - A tab called 'wards' containing the fields described under 'wards' [here](config/input_data_dictionary.json)
 - A tab called 'placements' containing the fields described under 'placements' [here](config/input_data_dictionary.json)
+
 There is a less technical description of how to fill in this input file in the "Input File Details" pop-over in the UI.
 
 Additional example data can be viewed by generating the fake data as above.
@@ -106,7 +107,6 @@ The project was adapted from the work carried out by the NHS AI Lab Skunkworks, 
 
 Find out more about the [NHS AI Lab Skunkworks](https://www.nhsx.nhs.uk/ai-lab/ai-lab-programmes/skunkworks/).
 
-Join our [Virtual Hub](https://future.nhs.uk/connect.ti/system/text/register) to hear more about future problem-sourcing event opportunities.
 Get in touch with the Skunkworks team at england.aiskunkworks@nhs.net.
 
 For any issues with this UHPT version of the scheduler, please contact Emily O'Brien at e.obrien6@nhs.net

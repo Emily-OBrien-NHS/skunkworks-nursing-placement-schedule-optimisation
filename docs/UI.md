@@ -6,14 +6,12 @@ This document provides an overview of the User Interface (UI) and the meaning of
 When the UI first loads, several components will be visible initially:
 | Component | Purpose |
 | --------- | ------- |
-| Information on the scheduler | Some information and links to the code repos. |
+| Information on the scheduler | Some information and links to the code repos and more detailed information about the scheduler. |
 | "Download Input Template" link | Allows user to download a blank excel input template. |
 | Contact details | Contact details for any questions/errors. |
 | "Usage Instructions" pop-over | A button to bring up the usage instructions. |
 | "Input File Details" pop-over | A button to bring up detailed information on what data should be filled into the input file. |
-| "Choose your page" dropdown | This dropdown menu allows the user to switch between "Run algorithm", "Create Student Input Sheet" and "Documentation". This allows the user to view more detailed documentation/instructions than in the pop-overs. |
-
-Note: If you upload a file into either the "Run Algorithm" or "Create Student Input Sheet" pages, and then switch to the other, the file will remain and a red error message will appear prompting you to change the input file.
+| "Choose your page" dropdown | This dropdown menu allows the user to switch between "Run algorithm", "Create Student Input Sheet" and "Documentation". The "Documentation" option allows the user to view more detailed documentation/instructions than in the pop-overs. |
 
 ### Create Student Input Sheet
 The UI has the below component when the Create Student Input Sheet page is selected:
@@ -38,7 +36,7 @@ Below these components may be several warnings/errors to flag to the user some i
 - All the mismatched courses (if exists):
     - An initial red error box detailing how mant students are on courses with no match in the placements tab
     - A yellow error box listing all the names of the students on the course shown in the table below this, which doesn't match to the placements tab (repeated for all the courses/students that don't match)
-    - A red error box and a table below detailing the courses in the placements tab which don't have any students assigned to them.  This may be that there is a typo of one of the above courses that students are on, but don't match.  If this is not the case, consider deleting this course from the input file for neatness (the algorithm will still run if additional courses are included, they will just be ignored).
+    - A red error box and a table below detailing the courses in the placements tab which don't have any students assigned to them.  This may be that there is a typo of one of the above courses that students are on, so they don't match.  If this is the case, please amend and reupload the input file to fix this.  If this is not the case, consider deleting this course from the input file for neatness (the algorithm will still run if additional courses are included, they will just be ignored).
 - A red error box and yellow warning box detailing the wards whose education audits have expired, or will expire during the placement period. 
 
 Whether or not these boxes appear will depend on if there are any mismatches in the input files and the Education Audit Status of your wards. Blue boxes will appear if there are no issues in each section. Note that the Education Audit Expiry date warnings **DO NOT** prevent students from going on placement at that ward. When each final schedule is produced, a list of wards with expired Education Audits will be generated as part of the detailed schedule, to demonstrate the wards which must have an Education Audit completed before placements can be accepted.
@@ -57,7 +55,7 @@ With each schedule that is finished, a table will be displayed summarising some 
 | Field | Explanation |
 | ----- | ----------- |
 | Schedule file name | This is the name of the schedule iteration |
-| Viable schedule? | This immediately tells you whether or not the schedule satisfies all of the [constraints](docs/constraints.md) specified |
+| Viable schedule? | This immediately tells you whether or not the schedule satisfies all of the [constraints](constraints.md) specified |
 | Number of iterations to generate | This tells you how many cycles of the algorithm it took to produce the final schedule |
 | Schedule Fitness Score | This is the fitness score of each schedule produced. These scores are mostly useful to compare schedules to each other |
 | Placement Utilisation Score | This is the average % utilisation of placement capacity on each ward |
@@ -81,4 +79,6 @@ If Student B goes on placements at the following wards: 'Ward A', 'Ward G', 'War
 ### After the algorithm has run
 Once the algorithm has finished running, some balloons will appear, as well as a green box stating 'Schedule production complete!'. This indicates that all of the requested schedules have been produced and are ready for human review.
 
-Download links for the comparison file and each individual output (both the detailed version and simplified UHPT version) will appear at the very bottom of the page.
+Download links for the comparison file and the output from each individual run will appear at the very bottom of the page.
+
+**Note**: If you upload a file into either the "Run Algorithm" or "Create Student Input Sheet" pages, and then switch to the other, the file will remain and a red error message will appear prompting you to change the input file.

@@ -10,6 +10,7 @@ This is a an important function as it is the way that each schedule is initialis
 - The ward chosen has capacity to accommodate the student (both in total and for students of their year group)
 - The ward chosen has a valid education audit in place
 - The ward has a covid risk status that the student is able to work with
+- If the ward is remote (need_to_drive = True), ensure the student can also drive.
 
 The function will randomly select wards until it finds one where these criteria are met. If one is not found in suitable time, the application will stop entirely as a valid solution is not possible.
 
