@@ -35,23 +35,23 @@ class DataLoader:
         if self.uni_placements["course_start"].dtype != object:
             self.uni_placements["course_start"] = pd.to_datetime(self.uni_placements["course_start"]).dt.strftime("%b-%y")
         self.students["student_name"] = (
-            self.students["Forename"].astype(str)
+            self.students["Forename"].str.strip().astype(str)
             + " "
-            +self.students["Surname"].astype(str)
+            +self.students["Surname"].str.strip().astype(str)
         )
         self.students["student_cohort"] = (
-            self.students["university"].astype(str)
+            self.students["university"].str.strip().astype(str)
             + "_"
-            + self.students["qualification"].astype(str)
+            + self.students["qualification"].str.strip().astype(str)
             + " "
-            + self.students["course_start"].astype(str)
+            + self.students["course_start"].str.strip().astype(str)
         )
         self.uni_placements["student_cohort"] = (
-            self.uni_placements["university"].astype(str)
+            self.uni_placements["university"].str.strip().astype(str)
             + "_"
-            + self.uni_placements["qualification"].astype(str)
+            + self.uni_placements["qualification"].str.strip().astype(str)
             + " "
-            + self.uni_placements["course_start"].astype(str)
+            + self.uni_placements["course_start"].str.strip().astype(str)
         )
 
         # Process student info
