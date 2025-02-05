@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from datetime import datetime
+from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import yaml
 import os
@@ -234,14 +234,23 @@ if page == "Run algorithm":
             except FileNotFoundError:
                 st.error(f"Issue with uploaded file {input_file}, "
                          "is this the correct input file?")
-
-            #Get the student start dates
+            #Get the student start date
             student_placement_starts = min(
                         dataload.student_placements["placement_start_date_raw"])
+            #If this is NaT, set to tomorrow.
+            if pd.isnull(student_placement_starts):
+                student_placement_starts = pd.to_datetime(datetime.now() + timedelta(days=1))
+            #Get the placement end date
             student_placement_ends = max(
                 dataload.student_placements["placement_start_date_raw"]
                 + pd.to_timedelta(dataload
                           .student_placements["placement_len_weeks"], unit='w'))
+            #if NaT, use tomorrow + max course length
+            if pd.isnull(student_placement_ends):
+                student_placement_ends =  pd.to_datetime(student_placement_starts
+                    + timedelta(weeks=
+                    int(dataload.uni_placements["placement_len_weeks"]
+                    .max())))
             
             #add start and end date inputs
             start_date = st.date_input("Start Date",
@@ -256,16 +265,14 @@ if page == "Run algorithm":
             if start_date >= end_date:
                 st.error(f"Start date comes after or on the same day as the end "
                          "date, please correct before proceeding")
-            else:
+            if True:
                 #else filter placements to between start and end.
                 dataload.student_placements = (dataload.student_placements.loc[
-                    (pd.to_datetime(
-                        dataload.student_placements.placement_start_date_raw
-                        ).dt.date >= start_date)
+                    (dataload.student_placements.placement_start_date_raw
+                     >= pd.to_datetime(start_date))
                     &
-                    (pd.to_datetime(
-                        dataload.student_placements.placement_start_date_raw
-                        ).dt.date < end_date)])
+                    (dataload.student_placements.placement_start_date_raw
+                     < pd.to_datetime(end_date))])
 
                 #Get user input for number of schedules
                 schedule_num = st.empty()

@@ -4,6 +4,7 @@ from src.Slot import Slot
 from src.Ward import Ward
 from src.Placement import Placement
 import re
+import streamlit as st
 
 class DataLoader:
     def readData(self, filename):#filename: str):
@@ -13,7 +14,6 @@ class DataLoader:
         :param filename: name of the .xlsx file in the data folder for input data to be read from
         :returns: nothing returned by function, various class objects created
         """
-
         # Load relevant files
         self.students = pd.read_excel(
             filename, sheet_name="students", engine="openpyxl"
@@ -22,13 +22,18 @@ class DataLoader:
         self.uni_placements = pd.read_excel(
             filename, sheet_name="placements", engine="openpyxl"
         )
-        #Convert bool columns to bools
-        self.students["is_driver"] = self.students["is_driver"].astype(bool)
-        self.ward_data["need_to_drive"] = self.ward_data["need_to_drive"].astype(bool)
-        self.ward_data["DYAD"] = self.ward_data["DYAD"].astype(bool)
+        #Convert bool columns to bools - quicker to do == True in case of typos.
+        self.students["is_driver"] = self.students["is_driver"] == "True"#.astype(bool)
+        self.ward_data["need_to_drive"] = self.ward_data["need_to_drive"] == "True"#.astype(bool)
+        self.ward_data["DYAD"] = self.ward_data["DYAD"] == "True"#self.ward_data["DYAD"].astype(bool)
         #Convert student id to int
         self.students["student_id"] = self.students["student_id"].astype('Int64')
-
+        #check date columns to ensure they match
+        if self.students["course_start"].dtype != object:
+            self.students["course_start"] = pd.to_datetime(self.students["course_start"]).dt.strftime("%b-%y")
+                #check date columns to ensure they match
+        if self.uni_placements["course_start"].dtype != object:
+            self.uni_placements["course_start"] = pd.to_datetime(self.uni_placements["course_start"]).dt.strftime("%b-%y")
         self.students["student_name"] = (
             self.students["Forename"].astype(str)
             + " "
@@ -98,6 +103,7 @@ class DataLoader:
         self.ward_data["capacity"] = self.ward_data[["capacity_num", "p1_cap", "p2_cap", "p3_cap", "nurse_associate_cap"]].max(
             axis=1
         )
+
         #DYAD logic - no year can have more than half capacity
         for dyad_ward in self.ward_data.loc[self.ward_data['DYAD'].fillna(False)].index:
             cap, p1, p2, p3 = self.ward_data.loc[dyad_ward, ["capacity", "p1_cap", "p2_cap", "p3_cap"]]
@@ -142,7 +148,6 @@ class DataLoader:
             "DYAD"
         ]
 
-
         self.ward_dep_match = pd.Series(
             self.ward_data.Department.values, index=self.ward_data.Ward
         ).to_dict()
@@ -157,6 +162,7 @@ class DataLoader:
         self.students["allprevwards"] = [
             ", ".join(prev_plac) for prev_plac in self.students["allprevwards"]
         ]
+
         self.student_placements = self.students.merge(
             self.uni_placements, how="left", on="student_cohort"
         )
