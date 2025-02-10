@@ -1,4 +1,4 @@
-# Input Columns Information
+# Algorithm Input File Information
 
 ## Students Sheet
 
@@ -140,3 +140,39 @@ Example: 22/04/2025
 The number of weeks this placement will last for.
 
 Example: 10
+
+# Students Sheet Input File
+
+This is the input from the university to allow the Create Student Input Sheet page on the app to run.  This will take the data from the university and put it into the correct format to copy and paste into your input file for the algorithm, avoiding the need to manually do this.  However, in order for this to work, the data from the uni must be consistent and follow the below column names and formats.
+
+#### Intake
+This the course the student is on, and when they started.  If this is left blank, that row will be removed from the data so it is important that this is filled in.  This must follow the format of (start month initial)(start year) (univeristy initials) (course name).  Some examples are:
+
+J22 UOP NUR APP ADULT PT
+S24 MJN NURS ADULT BSC
+
+The key bits which must follow the same format or this code won't work are:
+
+- the name must begin with the format MonthYearYear (e.g. S24) followd by a space.  The month part could be just the initial (S or J) or a shortened version (Sept or Jan).  The important parts are it is followed by the 2 digit version of the year, and then a space before the next part of the course name.
+- the next part of the name must be the univeristy initials, which are UOP for University of Plymouth or MJN for Marjon, again followed by a space.
+- Then the rest of the course name.
+
+#### Uni Number
+The student's id number.  Leave blank if id is not known.
+Example: 10777436
+
+#### Surname
+The Student's surname
+
+#### Forename
+The Student's forename
+
+#### Driver
+Column to indicate if the student is a driver or not.  Should be filled in as Yes or No.  Anything other than Yes (including typos of Yes e.g. Ys, Yse, Y) will be considered a non-driver.
+
+#### Placement n -
+These are multiple columns of a student's previous placements.  The important points with these columns are that the word placement is in the column name and that the ward name exactly matches the ward name on the ward sheet (so the algorithm can try to avoid placing the student on the same ward twice).
+
+
+
+Once this has created an output, you can download it and copy and past the table into the student sheet in your input file.  You shoud then check that the courses on this page match the placements page before trying to run the algorithm.

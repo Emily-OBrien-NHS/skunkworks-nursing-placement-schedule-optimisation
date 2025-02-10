@@ -19,7 +19,7 @@ The UI has the below component when the Create Student Input Sheet page is selec
 | --------- | ------- |
 | "File Upload" | User can drag and drop or browse their files to upload the correct input document |
 
-This page allows the user to upload the student information provided by the universities (provided it corresponds to the correct format (MORE INFO TO BE ADDED!!!!!!!!!!)).  This will run some code to transform this into the correct input required by the algorithm and provides a download link, so you can copy and paste into the students sheet on your algorithm input file.
+This page allows the user to upload the student information provided by the universities (provided it corresponds to the correct format - please see the end of the Input File Details section in the app).  This will run some code to transform this into the correct input required by the algorithm and provides a download link, so you can copy and paste into the students sheet on your algorithm input file.
 
 ### Run Algorithm
 The UI has the below components when the Run Algorithm page is selected:

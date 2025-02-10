@@ -65,7 +65,7 @@ class StudentTab:
                             .replace('X', np.nan).values.tolist())
         past_placements = [[e for e in row if e==e] for row in past_placements]
         is_driver = (df['Driver'].str.lower().fillna('no')
-                     .map({'no':False, 'yes':True}).astype(bool))
+                     .map({'no':False, 'yes':True}).fillna(False).astype(bool))
 
         students_tab = pd.DataFrame({'student_id':df['Uni Number'],
                                     'Forename':df['Forename'],

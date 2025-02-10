@@ -3,7 +3,7 @@ This is an application taken from [skunkworks nurse scheduler](https://github.co
 There are 3 page options from the 'Choose your page' drop down. The documentation page provides a more detailed summary of the intentions behind this app, and how the algorithm works.  The other 2 pages are part of the app functionality, and their usage instructions are detailed below.
                 
 ## Create student input sheet
-This page enables you to upload the student data provided by the university.  It will re-format it into the required format on the students tab in the input excel file and provide a file download link for this sheet.  You can then copy and paste this into the full input excel file.  It is important that the data from the universities is provided in the consistent format discussed, WORK OUT WHAT THIS IS AND DETAIL/GIVE DOWNLOAD TEMPLATE HERE.
+This page enables you to upload the student data provided by the university.  It will re-format it into the required format on the students tab in the input excel file and provide a file download link for this sheet.  You can then copy and paste this into the full input excel file.  It is important that the data from the universities is provided in the consistent format described at the end of the Input File Details section.
 
 ## Run algorithm
 This page will allow you to run the algorithm.  When this page is loaded, there is a drop down option to 'select your data source'.
